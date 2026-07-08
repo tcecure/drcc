@@ -34,6 +34,10 @@ const labCapacityMigration = readFileSync(
   resolve(process.cwd(), "../../supabase/migrations/20260708103000_lab_capacity_reservations.sql"),
   "utf8",
 );
+const emailJobsMigration = readFileSync(
+  resolve(process.cwd(), "../../supabase/migrations/20260708150000_email_jobs_notifications.sql"),
+  "utf8",
+);
 
 describe("auth profiles roles migration", () => {
   it("enables RLS for user-facing tables", () => {
@@ -119,5 +123,17 @@ describe("auth profiles roles migration", () => {
     expect(labCapacityMigration).toContain("select null, 20, 3, 48, 24, 7, 3, true");
     expect(labCapacityMigration).toContain("generate_series(1, 20)");
     expect(labCapacityMigration).toContain("public.current_user_has_any_role(array['admin', 'approver'])");
+  });
+
+  it("adds email jobs, notification management policies, and retry statuses", () => {
+    expect(emailJobsMigration).toContain("create table if not exists public.email_jobs");
+    expect(emailJobsMigration).toContain("'queued'");
+    expect(emailJobsMigration).toContain("'sending'");
+    expect(emailJobsMigration).toContain("'sent'");
+    expect(emailJobsMigration).toContain("'failed'");
+    expect(emailJobsMigration).toContain("'cancelled'");
+    expect(emailJobsMigration).toContain("rendered_text");
+    expect(emailJobsMigration).toContain("alter table public.email_jobs enable row level security");
+    expect(emailJobsMigration).toContain("public.current_user_has_any_role(array['admin', 'approver'])");
   });
 });

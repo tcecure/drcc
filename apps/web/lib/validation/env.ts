@@ -11,6 +11,12 @@ export const envSchema = z.object({
   MOODLE_API_TOKEN: z.string().optional(),
   MOODLE_WEB_SERVICE_NAME: z.string().optional(),
   MOODLE_WEBHOOK_SECRET: z.string().optional(),
+  AWS_REGION: z.string().optional(),
+  AWS_ACCESS_KEY_ID: z.string().optional(),
+  AWS_SECRET_ACCESS_KEY: z.string().optional(),
+  SES_FROM_ADDRESS: z.string().email().optional(),
+  SES_REPLY_TO_ADDRESS: z.string().email().optional(),
+  EMAIL_DELIVERY_MODE: z.enum(["mock", "live"]).default("mock"),
 });
 
 export const publicEnvSchema = envSchema.pick({
@@ -52,5 +58,11 @@ export function readServerEnv() {
     MOODLE_API_TOKEN: process.env.MOODLE_API_TOKEN,
     MOODLE_WEB_SERVICE_NAME: process.env.MOODLE_WEB_SERVICE_NAME,
     MOODLE_WEBHOOK_SECRET: process.env.MOODLE_WEBHOOK_SECRET,
+    AWS_REGION: process.env.AWS_REGION,
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+    SES_FROM_ADDRESS: process.env.SES_FROM_ADDRESS,
+    SES_REPLY_TO_ADDRESS: process.env.SES_REPLY_TO_ADDRESS,
+    EMAIL_DELIVERY_MODE: process.env.EMAIL_DELIVERY_MODE,
   });
 }

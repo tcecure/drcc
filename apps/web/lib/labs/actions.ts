@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { recordAuditEvent } from "@/lib/audit/audit-log";
+import { notifyUser } from "@/lib/notifications/service";
 import { approverRoles, requireAnyRole, requireAuthenticatedUser } from "@/lib/permissions/roles";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -200,6 +201,15 @@ export async function submitLabRequestAction(formData: FormData) {
       lab_track_id: parsed.data.labTrackId,
       queue_entry_id: queueEntry?.id ?? null,
       status: "queued",
+    },
+  });
+  await notifyUser({
+    userId: user.id,
+    templateName: "lab_request_submitted",
+    actionUrl: "/dashboard/labs/queue",
+    payload: {
+      labRequestId: labRequest.id,
+      queueEntryId: queueEntry?.id ?? null,
     },
   });
 
@@ -412,12 +422,15 @@ export async function offerLabReservationAction(formData: FormData) {
     })
     .eq("id", entry.id);
   await supabase.from("lab_requests").update({ status: "reserved" }).eq("id", entry.lab_request_id);
-  await supabase.from("notifications").insert({
-    user_id: entry.user_id,
-    notification_type: "lab_reservation_offered",
-    title: "Lab reservation offered",
-    message: "A hands-on lab slot is available. Confirm or decline the reservation from your labs dashboard.",
-    action_url: "/dashboard/labs/reservation",
+  await notifyUser({
+    userId: entry.user_id,
+    templateName: "reservation_offered",
+    actionUrl: "/dashboard/labs/reservation",
+    payload: {
+      queueEntryId: entry.id,
+      labInstanceId: instance.id,
+      confirmationExpiresAt,
+    },
   });
 
   await recordAuditEvent({
@@ -498,6 +511,16 @@ export async function acceptLabReservationAction(formData: FormData) {
     entityId: assignment.id,
     previousValue: { status: assignment.status },
     newValue: { status: "reserved", expires_at: expiresAt, provisioning_placeholder: true },
+  });
+  await notifyUser({
+    userId: user.id,
+    templateName: "lab_access_provisioned",
+    actionUrl: "/dashboard/labs/current",
+    payload: {
+      assignmentId: assignment.id,
+      labInstanceId: assignment.lab_instance_id,
+      expiresAt,
+    },
   });
 
   revalidatePath("/dashboard/labs/reservation");

@@ -7,6 +7,7 @@ import { recordAuditEvent } from "@/lib/audit/audit-log";
 import { approverRoles, requireAnyRole, requireAuthenticatedUser } from "@/lib/permissions/roles";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createMoodleUser, enrollUserInCourse, getMoodleIntegrationMode } from "@/lib/moodle/client";
+import { notifyUser } from "@/lib/notifications/service";
 import type { Json } from "@/types/database";
 
 function formMessage(message: string) {
@@ -147,6 +148,15 @@ export async function runMockMoodleJobAction(formData: FormData) {
     entityId: job.id,
     newValue: { moodle_user_id: moodleUser.id, course_id: courseId },
   });
+  await notifyUser({
+    userId: job.user_id,
+    templateName: "moodle_enrollment_ready",
+    actionUrl: "/dashboard/training",
+    payload: {
+      courseId,
+      moodleUserId: moodleUser.id,
+    },
+  });
 
   revalidatePath("/admin/moodle/jobs");
   revalidatePath("/admin/moodle/enrollments");
@@ -179,12 +189,21 @@ export async function markMoodleCourseCompleteAction(formData: FormData) {
       last_synced_at: new Date().toISOString(),
     })
     .eq("id", enrollment.id);
-  await supabase.from("notifications").insert({
-    user_id: enrollment.user_id,
-    notification_type: "moodle_course_completed",
-    title: "Training complete",
-    message: "Your required training is complete. You are eligible to request hands-on lab access.",
-    action_url: "/dashboard/access/new",
+  await notifyUser({
+    userId: enrollment.user_id,
+    templateName: "moodle_course_completed",
+    actionUrl: "/dashboard/labs/request",
+    payload: {
+      enrollmentId: enrollment.id,
+    },
+  });
+  await notifyUser({
+    userId: enrollment.user_id,
+    templateName: "hands_on_eligibility_unlocked",
+    actionUrl: "/dashboard/labs/request",
+    payload: {
+      enrollmentId: enrollment.id,
+    },
   });
   await recordAuditEvent({
     actorId: actor.id,

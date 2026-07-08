@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 
 import { recordAuditEvent } from "@/lib/audit/audit-log";
+import { notifyUser } from "@/lib/notifications/service";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { readServerEnv } from "@/lib/validation/env";
 
@@ -74,12 +75,22 @@ export async function POST(request: Request) {
   }
 
   if (payload.completed) {
-    await supabase.from("notifications").insert({
-      user_id: payload.user_id,
-      notification_type: "moodle_course_completed",
-      title: "Training complete",
-      message: "Your required training is complete. You are eligible to request hands-on lab access.",
-      action_url: "/dashboard/access/new",
+    await notifyUser({
+      userId: payload.user_id,
+      templateName: "moodle_course_completed",
+      actionUrl: "/dashboard/labs/request",
+      payload: {
+        moodleCourseId: payload.moodle_course_id,
+        progressPercentage: progress,
+      },
+    });
+    await notifyUser({
+      userId: payload.user_id,
+      templateName: "hands_on_eligibility_unlocked",
+      actionUrl: "/dashboard/labs/request",
+      payload: {
+        moodleCourseId: payload.moodle_course_id,
+      },
     });
   }
 

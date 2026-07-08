@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 
 import { recordAuditEvent } from "@/lib/audit/audit-log";
 import { createMoodleEnrollmentJob } from "@/lib/moodle/actions";
+import { notifyUser } from "@/lib/notifications/service";
+import type { EmailTemplateName } from "@/lib/notifications/templates";
 import {
   approverRoles,
   requireAnyRole,
@@ -128,6 +130,18 @@ export async function saveAccessRequestAction(formData: FormData) {
       redirect(`/dashboard/access/${parsed.data.requestId}?error=${formMessage(error.message)}`);
     }
 
+    if (status === "submitted" && existing.status !== "submitted") {
+      await notifyUser({
+        userId: user.id,
+        templateName: "access_request_submitted",
+        actionUrl: `/dashboard/access/${parsed.data.requestId}`,
+        payload: {
+          requestId: parsed.data.requestId,
+          requestedProgram: parsed.data.requestedProgram,
+        },
+      });
+    }
+
     revalidatePath("/dashboard/access");
     redirect(requestRedirect(parsed.data.requestId, status === "submitted" ? "Request submitted." : "Draft saved."));
   }
@@ -143,6 +157,18 @@ export async function saveAccessRequestAction(formData: FormData) {
 
   if (error || !data) {
     redirect(`/dashboard/access/new?error=${formMessage(error?.message ?? "Request could not be saved.")}`);
+  }
+
+  if (status === "submitted") {
+    await notifyUser({
+      userId: user.id,
+      templateName: "access_request_submitted",
+      actionUrl: `/dashboard/access/${data.id}`,
+      payload: {
+        requestId: data.id,
+        requestedProgram: parsed.data.requestedProgram,
+      },
+    });
   }
 
   await recordAuditEvent({
@@ -256,12 +282,15 @@ export async function reviewAccessRequestAction(formData: FormData) {
     }
   }
 
-  await supabase.from("notifications").insert({
-    user_id: previousRequest.user_id,
-    notification_type: "access_request_decision",
-    title: notificationTitle(nextStatus),
-    message: notificationMessage(nextStatus, parsed.data.decisionNotes),
-    action_url: `/dashboard/access/${parsed.data.requestId}`,
+  await notifyUser({
+    userId: previousRequest.user_id,
+    templateName: notificationTemplateName(nextStatus),
+    actionUrl: `/dashboard/access/${parsed.data.requestId}`,
+    payload: {
+      requestId: parsed.data.requestId,
+      notes: parsed.data.decisionNotes || undefined,
+      status: nextStatus,
+    },
   });
 
   await recordAuditEvent({
@@ -287,36 +316,18 @@ export async function reviewAccessRequestAction(formData: FormData) {
   redirect(`/dashboard/approvals/${parsed.data.requestId}?message=${formMessage("Request updated.")}`);
 }
 
-function notificationTitle(status: AccessRequestStatus) {
+function notificationTemplateName(status: AccessRequestStatus): EmailTemplateName {
   if (status === "approved") {
-    return "Access request approved";
+    return "request_approved";
   }
 
   if (status === "denied") {
-    return "Access request denied";
+    return "request_denied";
   }
 
   if (status === "more_information_required") {
-    return "More information requested";
+    return "more_information_required";
   }
 
-  return "Access request under review";
-}
-
-function notificationMessage(status: AccessRequestStatus, notes?: string) {
-  const suffix = notes ? ` Reviewer note: ${notes}` : "";
-
-  if (status === "approved") {
-    return `Your DigitalRCC access request has been approved.${suffix}`;
-  }
-
-  if (status === "denied") {
-    return `Your DigitalRCC access request was denied.${suffix}`;
-  }
-
-  if (status === "more_information_required") {
-    return `An approver needs more information before deciding.${suffix}`;
-  }
-
-  return `An approver is reviewing your DigitalRCC access request.${suffix}`;
+  return "support_request_updated";
 }

@@ -64,6 +64,12 @@ export default async function AdminPage() {
           >
             Lab capacity
           </Link>
+          <Link
+            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
+            href="/admin/email-jobs"
+          >
+            Email jobs
+          </Link>
         </div>
       </section>
       <section className="rounded-lg border bg-card shadow-sm">

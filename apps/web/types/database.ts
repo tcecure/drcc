@@ -256,6 +256,66 @@ export type Database = {
           },
         ];
       };
+      email_jobs: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          template_name: string;
+          recipient: string;
+          subject: string;
+          payload: Json;
+          rendered_text: string | null;
+          rendered_html: string | null;
+          status: "queued" | "sending" | "sent" | "failed" | "cancelled";
+          attempts: number;
+          error_message: string | null;
+          requested_at: string;
+          sent_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          template_name: string;
+          recipient: string;
+          subject: string;
+          payload?: Json;
+          rendered_text?: string | null;
+          rendered_html?: string | null;
+          status?: Database["public"]["Tables"]["email_jobs"]["Row"]["status"];
+          attempts?: number;
+          error_message?: string | null;
+          requested_at?: string;
+          sent_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          user_id?: string | null;
+          template_name?: string;
+          recipient?: string;
+          subject?: string;
+          payload?: Json;
+          rendered_text?: string | null;
+          rendered_html?: string | null;
+          status?: Database["public"]["Tables"]["email_jobs"]["Row"]["status"];
+          attempts?: number;
+          error_message?: string | null;
+          requested_at?: string;
+          sent_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "email_jobs_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       pre_registration_interests: {
         Row: {
           id: string;
