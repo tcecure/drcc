@@ -166,6 +166,32 @@ export const supportStatusSchema = z.object({
   status: z.enum(["open", "in_progress", "waiting_on_student", "resolved", "closed"]),
 });
 
+export const customerEngagementSchema = z.object({
+  engagementName: z.string().trim().min(3, "Engagement name is required."),
+  customerDisplayName: z.string().trim().min(2, "Customer display name is required."),
+  engagementType: z.enum(["readiness_support", "assessment_prep", "vulnerability_review", "secure_collaboration", "other"]),
+  status: z.enum(["planning", "active", "paused", "completed", "archived"]),
+  startDate: z.string().trim().optional(),
+  endDate: z.string().trim().optional(),
+  internalWorkspaceUrl: z.string().trim().url("Use a valid controlled workspace URL.").optional().or(z.literal("")),
+  classificationNotice: z.string().trim().min(12, "Classification notice is required."),
+});
+
+export const customerMemberSchema = z.object({
+  engagementId: z.string().uuid(),
+  userId: z.string().uuid(),
+  engagementRole: z.enum(["viewer", "analyst", "lead", "reviewer", "owner"]),
+  accessStartsAt: z.string().trim().optional(),
+  accessExpiresAt: z.string().trim().optional(),
+});
+
+export const customerAccessReviewSchema = z.object({
+  engagementId: z.string().uuid(),
+  userId: z.string().uuid(),
+  reviewStatus: z.enum(["approved", "revoked", "needs_review"]),
+  reviewNotes: z.string().trim().optional(),
+});
+
 export const labCapacitySettingsSchema = z.object({
   capacitySettingsId: z.string().uuid(),
   maximumActive: z.coerce.number().int().min(1).max(500),
@@ -227,4 +253,5 @@ export type LabRequestFormInput = z.infer<typeof labRequestFormSchema>;
 export type LabCapacitySettingsInput = z.infer<typeof labCapacitySettingsSchema>;
 export type LabVerificationRequestInput = z.infer<typeof labVerificationRequestSchema>;
 export type SupportRequestInput = z.infer<typeof supportRequestSchema>;
+export type CustomerEngagementInput = z.infer<typeof customerEngagementSchema>;
 export type ResourceEditorInput = z.infer<typeof resourceEditorSchema>;

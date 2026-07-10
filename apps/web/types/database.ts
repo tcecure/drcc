@@ -1179,6 +1179,136 @@ export type Database = {
           },
         ];
       };
+      customer_engagements: {
+        Row: {
+          id: string;
+          engagement_name: string;
+          customer_display_name: string;
+          engagement_type: "readiness_support" | "assessment_prep" | "vulnerability_review" | "secure_collaboration" | "other";
+          status: "planning" | "active" | "paused" | "completed" | "archived";
+          start_date: string | null;
+          end_date: string | null;
+          owner_id: string | null;
+          internal_workspace_url: string | null;
+          classification_notice: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          engagement_name: string;
+          customer_display_name: string;
+          engagement_type: Database["public"]["Tables"]["customer_engagements"]["Row"]["engagement_type"];
+          status?: Database["public"]["Tables"]["customer_engagements"]["Row"]["status"];
+          start_date?: string | null;
+          end_date?: string | null;
+          owner_id?: string | null;
+          internal_workspace_url?: string | null;
+          classification_notice?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          engagement_name?: string;
+          customer_display_name?: string;
+          engagement_type?: Database["public"]["Tables"]["customer_engagements"]["Row"]["engagement_type"];
+          status?: Database["public"]["Tables"]["customer_engagements"]["Row"]["status"];
+          start_date?: string | null;
+          end_date?: string | null;
+          owner_id?: string | null;
+          internal_workspace_url?: string | null;
+          classification_notice?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      customer_engagement_members: {
+        Row: {
+          id: string;
+          engagement_id: string;
+          user_id: string;
+          engagement_role: "viewer" | "analyst" | "lead" | "reviewer" | "owner";
+          approved_by: string | null;
+          access_starts_at: string;
+          access_expires_at: string | null;
+          last_reviewed_at: string | null;
+          status: "active" | "suspended" | "expired" | "revoked";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          engagement_id: string;
+          user_id: string;
+          engagement_role: Database["public"]["Tables"]["customer_engagement_members"]["Row"]["engagement_role"];
+          approved_by?: string | null;
+          access_starts_at?: string;
+          access_expires_at?: string | null;
+          last_reviewed_at?: string | null;
+          status?: Database["public"]["Tables"]["customer_engagement_members"]["Row"]["status"];
+          created_at?: string;
+        };
+        Update: {
+          engagement_role?: Database["public"]["Tables"]["customer_engagement_members"]["Row"]["engagement_role"];
+          approved_by?: string | null;
+          access_starts_at?: string;
+          access_expires_at?: string | null;
+          last_reviewed_at?: string | null;
+          status?: Database["public"]["Tables"]["customer_engagement_members"]["Row"]["status"];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "customer_engagement_members_engagement_id_fkey";
+            columns: ["engagement_id"];
+            isOneToOne: false;
+            referencedRelation: "customer_engagements";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "customer_engagement_members_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      customer_access_reviews: {
+        Row: {
+          id: string;
+          engagement_id: string;
+          user_id: string;
+          reviewer_id: string | null;
+          review_status: "approved" | "revoked" | "needs_review";
+          review_notes: string | null;
+          reviewed_at: string;
+        };
+        Insert: {
+          id?: string;
+          engagement_id: string;
+          user_id: string;
+          reviewer_id?: string | null;
+          review_status: Database["public"]["Tables"]["customer_access_reviews"]["Row"]["review_status"];
+          review_notes?: string | null;
+          reviewed_at?: string;
+        };
+        Update: never;
+        Relationships: [
+          {
+            foreignKeyName: "customer_access_reviews_engagement_id_fkey";
+            columns: ["engagement_id"];
+            isOneToOne: false;
+            referencedRelation: "customer_engagements";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "customer_access_reviews_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: {

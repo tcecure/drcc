@@ -46,6 +46,10 @@ const labExperienceMigration = readFileSync(
   resolve(process.cwd(), "../../supabase/migrations/20260710100000_lab_verifications_support.sql"),
   "utf8",
 );
+const customerDeliveryMigration = readFileSync(
+  resolve(process.cwd(), "../../supabase/migrations/20260710130000_customer_delivery_zone.sql"),
+  "utf8",
+);
 
 describe("auth profiles roles migration", () => {
   it("enables RLS for user-facing tables", () => {
@@ -168,5 +172,15 @@ describe("auth profiles roles migration", () => {
     expect(labExperienceMigration).toContain("students can read their own lab verifications");
     expect(labExperienceMigration).toContain("students can create their own support requests");
     expect(labExperienceMigration).toContain("public.current_user_has_any_role(array['admin', 'approver'])");
+  });
+
+  it("adds metadata-only Customer Delivery Zone access controls", () => {
+    expect(customerDeliveryMigration).toContain("create table if not exists public.customer_engagements");
+    expect(customerDeliveryMigration).toContain("create table if not exists public.customer_engagement_members");
+    expect(customerDeliveryMigration).toContain("create table if not exists public.customer_access_reviews");
+    expect(customerDeliveryMigration).toContain("Metadata only. Customer material remains in the controlled environment.");
+    expect(customerDeliveryMigration).toContain("members can read assigned customer engagements");
+    expect(customerDeliveryMigration).toContain("access_expires_at > now()");
+    expect(customerDeliveryMigration).toContain("public.current_user_has_any_role(array['admin', 'approver'])");
   });
 });

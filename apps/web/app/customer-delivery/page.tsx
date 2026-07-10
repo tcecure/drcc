@@ -1,53 +1,56 @@
-import type { Metadata } from "next";
+import Link from "next/link";
 
-import { CallToAction } from "@/components/organisms/call-to-action";
-import { FeatureGrid } from "@/components/organisms/feature-grid";
-import { PageHeader } from "@/components/templates/page-header";
+import { DashboardNav } from "@/components/organisms/dashboard-nav";
+import { getUserRoles, requireAuthenticatedUser } from "@/lib/permissions/roles";
+import { createAdminClient } from "@/lib/supabase/admin";
 
-export const metadata: Metadata = {
-  title: "Customer Delivery Zone",
-  description:
-    "Learn how the isolated Customer Delivery Zone supports approved assessments, vulnerability reviews, collaboration, reporting, and readiness work.",
-};
+export default async function CustomerDeliveryPage() {
+  const user = await requireAuthenticatedUser();
+  const roles = await getUserRoles();
+  const supabase = createAdminClient();
+  const { data: memberships } = await supabase
+    .from("customer_engagement_members")
+    .select("*")
+    .eq("user_id", user.id)
+    .eq("status", "active");
+  const activeMemberships = (memberships ?? []).filter((member) => {
+    const starts = new Date(member.access_starts_at).getTime();
+    const expires = member.access_expires_at ? new Date(member.access_expires_at).getTime() : Number.POSITIVE_INFINITY;
+    const now = Date.now();
+    return starts <= now && expires > now;
+  });
 
-const deliveryFeatures = [
-  { title: "Approved customer assessments" },
-  { title: "Vulnerability reviews" },
-  { title: "Secure collaboration" },
-  { title: "Reporting" },
-  { title: "Readiness work" },
-];
-
-export default function CustomerDeliveryPage() {
   return (
-    <main className="flex flex-1 flex-col">
-      <PageHeader
-        title="Customer Delivery Zone"
-        description="An isolated environment for approved customer security support and readiness workflows."
-      />
-      <section className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
-        <div>
-          <h2 className="text-3xl font-semibold">Separate by design</h2>
-          <p className="mt-4 leading-7 text-muted-foreground">
-            The Customer Delivery Zone supports customer-facing work without
-            blending protected engagements into normal student access.
+    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8">
+      <DashboardNav roles={roles} />
+      <section>
+        <h1 className="text-4xl font-semibold">Customer Delivery Zone</h1>
+        <p className="mt-3 max-w-3xl leading-7 text-muted-foreground">
+          Metadata-only access for approved customer engagements. Customer material remains in the controlled environment.
+        </p>
+      </section>
+      <section className="rounded-lg border border-primary/30 bg-primary/10 p-5 text-sm text-primary">
+        Public portal records contain engagement metadata only. Do not upload CUI, evidence, reports, credentials, scan data, or assessment artifacts.
+      </section>
+      <section className="grid gap-4 md:grid-cols-2">
+        <Link className="rounded-lg border bg-card p-5 shadow-sm hover:bg-muted/60" href="/customer-delivery/engagements">
+          <h2 className="text-lg font-semibold">My engagements</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            View approved engagement metadata and controlled workspace links.
           </p>
-          <p className="mt-5 rounded-lg border border-primary/30 bg-primary/10 p-4 font-medium text-primary">
-            It is not part of normal student access.
+        </Link>
+        <div className="rounded-lg border bg-card p-5 shadow-sm">
+          <h2 className="text-lg font-semibold">MFA status</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            MFA requirement placeholder. Access requires staff approval and current engagement membership.
           </p>
         </div>
-        <FeatureGrid features={deliveryFeatures} columns="two" />
       </section>
-      <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-        <CallToAction
-          title="Ask about customer support"
-          description="Contact the clinic team to discuss readiness support, assessment preparation, or collaboration needs."
-          primaryHref="/contact"
-          primaryLabel="Contact DigitalRCC"
-          secondaryHref="/about"
-          secondaryLabel="About the Clinic"
-        />
-      </div>
+      {!activeMemberships.length ? (
+        <p className="rounded-md border bg-card p-4 text-sm text-muted-foreground">
+          You do not currently have active Customer Delivery Zone engagement access.
+        </p>
+      ) : null}
     </main>
   );
 }
