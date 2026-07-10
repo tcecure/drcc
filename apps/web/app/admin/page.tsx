@@ -76,6 +76,18 @@ export default async function AdminPage() {
           >
             Provisioning
           </Link>
+          <Link
+            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
+            href="/admin/verifications"
+          >
+            Verifications
+          </Link>
+          <Link
+            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
+            href="/admin/support"
+          >
+            Support
+          </Link>
         </div>
       </section>
       <section className="rounded-lg border bg-card shadow-sm">

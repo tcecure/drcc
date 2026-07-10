@@ -42,6 +42,10 @@ const provisioningMigration = readFileSync(
   resolve(process.cwd(), "../../supabase/migrations/20260709100000_provisioning_jobs_bridge.sql"),
   "utf8",
 );
+const labExperienceMigration = readFileSync(
+  resolve(process.cwd(), "../../supabase/migrations/20260710100000_lab_verifications_support.sql"),
+  "utf8",
+);
 
 describe("auth profiles roles migration", () => {
   it("enables RLS for user-facing tables", () => {
@@ -152,5 +156,17 @@ describe("auth profiles roles migration", () => {
     expect(provisioningMigration).toContain("alter table public.provisioning_jobs enable row level security");
     expect(provisioningMigration).toContain("students can read their own provisioning jobs");
     expect(provisioningMigration).toContain("public.current_user_has_any_role(array['admin', 'approver'])");
+  });
+
+  it("adds lab verification and support request workflows", () => {
+    expect(labExperienceMigration).toContain("create table if not exists public.lab_verifications");
+    expect(labExperienceMigration).toContain("create table if not exists public.support_requests");
+    expect(labExperienceMigration).toContain("'passed'");
+    expect(labExperienceMigration).toContain("'failed'");
+    expect(labExperienceMigration).toContain("'waiting_on_student'");
+    expect(labExperienceMigration).toContain("alter table public.lab_verifications enable row level security");
+    expect(labExperienceMigration).toContain("students can read their own lab verifications");
+    expect(labExperienceMigration).toContain("students can create their own support requests");
+    expect(labExperienceMigration).toContain("public.current_user_has_any_role(array['admin', 'approver'])");
   });
 });

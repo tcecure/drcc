@@ -46,6 +46,7 @@ export default async function LabsDashboardPage() {
         <DashboardLink href="/dashboard/labs/reservation" title="Reservation" description="Accept or decline offered lab reservations." />
         <DashboardLink href="/dashboard/labs/current" title="Current lab" description="Review active or reserved lab access." />
         <DashboardLink href="/dashboard/labs/history" title="History" description="Review previous lab requests and outcomes." />
+        <DashboardLink href="/dashboard/support" title="Support" description="Open or track lab support requests." />
       </section>
     </main>
   );

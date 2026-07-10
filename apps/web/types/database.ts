@@ -1067,6 +1067,118 @@ export type Database = {
           },
         ];
       };
+      lab_verifications: {
+        Row: {
+          id: string;
+          lab_assignment_id: string;
+          user_id: string;
+          verification_type: "check_progress" | "verify_lab";
+          status: "not_started" | "queued" | "running" | "passed" | "failed" | "error";
+          score: number | null;
+          results: Json;
+          external_job_id: string | null;
+          requested_at: string;
+          completed_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          lab_assignment_id: string;
+          user_id: string;
+          verification_type?: Database["public"]["Tables"]["lab_verifications"]["Row"]["verification_type"];
+          status?: Database["public"]["Tables"]["lab_verifications"]["Row"]["status"];
+          score?: number | null;
+          results?: Json;
+          external_job_id?: string | null;
+          requested_at?: string;
+          completed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          verification_type?: Database["public"]["Tables"]["lab_verifications"]["Row"]["verification_type"];
+          status?: Database["public"]["Tables"]["lab_verifications"]["Row"]["status"];
+          score?: number | null;
+          results?: Json;
+          external_job_id?: string | null;
+          completed_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "lab_verifications_lab_assignment_id_fkey";
+            columns: ["lab_assignment_id"];
+            isOneToOne: false;
+            referencedRelation: "lab_assignments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "lab_verifications_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      support_requests: {
+        Row: {
+          id: string;
+          user_id: string;
+          lab_assignment_id: string | null;
+          category: "connectivity" | "guacamole" | "vpn" | "lab_guide" | "verification" | "other";
+          subject: string;
+          description: string;
+          priority: "low" | "normal" | "high" | "urgent";
+          status: "open" | "in_progress" | "waiting_on_student" | "resolved" | "closed";
+          assigned_to: string | null;
+          created_at: string;
+          updated_at: string;
+          resolved_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          lab_assignment_id?: string | null;
+          category: Database["public"]["Tables"]["support_requests"]["Row"]["category"];
+          subject: string;
+          description: string;
+          priority?: Database["public"]["Tables"]["support_requests"]["Row"]["priority"];
+          status?: Database["public"]["Tables"]["support_requests"]["Row"]["status"];
+          assigned_to?: string | null;
+          created_at?: string;
+          updated_at?: string;
+          resolved_at?: string | null;
+        };
+        Update: {
+          lab_assignment_id?: string | null;
+          category?: Database["public"]["Tables"]["support_requests"]["Row"]["category"];
+          subject?: string;
+          description?: string;
+          priority?: Database["public"]["Tables"]["support_requests"]["Row"]["priority"];
+          status?: Database["public"]["Tables"]["support_requests"]["Row"]["status"];
+          assigned_to?: string | null;
+          updated_at?: string;
+          resolved_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "support_requests_lab_assignment_id_fkey";
+            columns: ["lab_assignment_id"];
+            isOneToOne: false;
+            referencedRelation: "lab_assignments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "support_requests_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: {

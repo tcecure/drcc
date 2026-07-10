@@ -148,6 +148,24 @@ export const labAssignmentActionSchema = z.object({
   assignmentId: z.string().uuid(),
 });
 
+export const labVerificationRequestSchema = z.object({
+  assignmentId: z.string().uuid(),
+  verificationType: z.enum(["check_progress", "verify_lab"]),
+});
+
+export const supportRequestSchema = z.object({
+  labAssignmentId: z.string().uuid().optional(),
+  category: z.enum(["connectivity", "guacamole", "vpn", "lab_guide", "verification", "other"]),
+  subject: z.string().trim().min(6, "Subject is required."),
+  description: z.string().trim().min(20, "Share at least 20 characters about the issue."),
+  priority: z.enum(["low", "normal", "high", "urgent"]),
+});
+
+export const supportStatusSchema = z.object({
+  supportRequestId: z.string().uuid(),
+  status: z.enum(["open", "in_progress", "waiting_on_student", "resolved", "closed"]),
+});
+
 export const labCapacitySettingsSchema = z.object({
   capacitySettingsId: z.string().uuid(),
   maximumActive: z.coerce.number().int().min(1).max(500),
@@ -207,4 +225,6 @@ export type AccessRequestFormInput = z.infer<typeof accessRequestFormSchema>;
 export type AccessRequestDecisionInput = z.infer<typeof accessRequestDecisionSchema>;
 export type LabRequestFormInput = z.infer<typeof labRequestFormSchema>;
 export type LabCapacitySettingsInput = z.infer<typeof labCapacitySettingsSchema>;
+export type LabVerificationRequestInput = z.infer<typeof labVerificationRequestSchema>;
+export type SupportRequestInput = z.infer<typeof supportRequestSchema>;
 export type ResourceEditorInput = z.infer<typeof resourceEditorSchema>;
