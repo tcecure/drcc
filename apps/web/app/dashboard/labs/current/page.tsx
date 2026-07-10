@@ -21,7 +21,24 @@ export default async function CurrentLabPage({ searchParams }: CurrentLabPagePro
   const { data: instances } = instanceIds.length
     ? await supabase.from("lab_instances").select("*").in("id", instanceIds)
     : { data: [] };
+  const assignmentIds = (assignments ?? []).map((assignment) => assignment.id);
+  const { data: provisioningJobs } = assignmentIds.length
+    ? await supabase
+        .from("provisioning_jobs")
+        .select("id, lab_assignment_id, job_type, status, requested_at, completed_at")
+        .in("lab_assignment_id", assignmentIds)
+        .order("requested_at", { ascending: true })
+    : { data: [] };
   const instanceMap = new Map((instances ?? []).map((instance) => [instance.id, instance]));
+  const jobsByAssignment = new Map<string, typeof provisioningJobs>();
+
+  for (const job of provisioningJobs ?? []) {
+    if (!job.lab_assignment_id) {
+      continue;
+    }
+
+    jobsByAssignment.set(job.lab_assignment_id, [...(jobsByAssignment.get(job.lab_assignment_id) ?? []), job]);
+  }
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8">
@@ -44,8 +61,18 @@ export default async function CurrentLabPage({ searchParams }: CurrentLabPagePro
               <article className="grid gap-3 p-5 text-sm md:grid-cols-[1fr_auto]" key={assignment.id}>
                 <div>
                   <h2 className="font-medium">{instance?.pod_name ?? "Lab pod"}</h2>
-                  <p className="mt-1 text-muted-foreground">{instance?.environment_identifier}</p>
                   <p className="mt-1 text-muted-foreground">Expires: {assignment.expires_at ?? "Pending"}</p>
+                  <div className="mt-4 grid gap-2">
+                    {(jobsByAssignment.get(assignment.id) ?? []).map((job) => (
+                      <div className="rounded-md border bg-background p-3" key={job.id}>
+                        <p className="font-medium capitalize">{job.job_type.replaceAll("_", " ")}</p>
+                        <p className="mt-1 text-muted-foreground capitalize">{job.status.replaceAll("_", " ")}</p>
+                      </div>
+                    ))}
+                    {(jobsByAssignment.get(assignment.id) ?? []).length === 0 ? (
+                      <p className="text-muted-foreground">Provisioning has not started yet.</p>
+                    ) : null}
+                  </div>
                 </div>
                 <p className="font-medium capitalize">{formatLabValue(assignment.status)}</p>
               </article>

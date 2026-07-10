@@ -17,6 +17,9 @@ export const envSchema = z.object({
   SES_FROM_ADDRESS: z.string().email().optional(),
   SES_REPLY_TO_ADDRESS: z.string().email().optional(),
   EMAIL_DELIVERY_MODE: z.enum(["mock", "live"]).default("mock"),
+  BRIDGE_ID: z.string().optional(),
+  BRIDGE_SECRET: z.string().optional(),
+  INTEGRATION_MODE: z.enum(["mock", "live"]).default("mock"),
 });
 
 export const publicEnvSchema = envSchema.pick({
@@ -64,5 +67,8 @@ export function readServerEnv() {
     SES_FROM_ADDRESS: process.env.SES_FROM_ADDRESS,
     SES_REPLY_TO_ADDRESS: process.env.SES_REPLY_TO_ADDRESS,
     EMAIL_DELIVERY_MODE: process.env.EMAIL_DELIVERY_MODE,
+    BRIDGE_ID: process.env.BRIDGE_ID,
+    BRIDGE_SECRET: process.env.BRIDGE_SECRET,
+    INTEGRATION_MODE: process.env.INTEGRATION_MODE,
   });
 }

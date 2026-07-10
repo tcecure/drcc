@@ -38,6 +38,10 @@ const emailJobsMigration = readFileSync(
   resolve(process.cwd(), "../../supabase/migrations/20260708150000_email_jobs_notifications.sql"),
   "utf8",
 );
+const provisioningMigration = readFileSync(
+  resolve(process.cwd(), "../../supabase/migrations/20260709100000_provisioning_jobs_bridge.sql"),
+  "utf8",
+);
 
 describe("auth profiles roles migration", () => {
   it("enables RLS for user-facing tables", () => {
@@ -135,5 +139,18 @@ describe("auth profiles roles migration", () => {
     expect(emailJobsMigration).toContain("rendered_text");
     expect(emailJobsMigration).toContain("alter table public.email_jobs enable row level security");
     expect(emailJobsMigration).toContain("public.current_user_has_any_role(array['admin', 'approver'])");
+  });
+
+  it("adds provisioning jobs and bridge event policies", () => {
+    expect(provisioningMigration).toContain("create table if not exists public.provisioning_jobs");
+    expect(provisioningMigration).toContain("create table if not exists public.provisioning_job_events");
+    expect(provisioningMigration).toContain("'assign_student_to_pod'");
+    expect(provisioningMigration).toContain("'provision_guacamole_access'");
+    expect(provisioningMigration).toContain("'queued'");
+    expect(provisioningMigration).toContain("'claimed'");
+    expect(provisioningMigration).toContain("'successful'");
+    expect(provisioningMigration).toContain("alter table public.provisioning_jobs enable row level security");
+    expect(provisioningMigration).toContain("students can read their own provisioning jobs");
+    expect(provisioningMigration).toContain("public.current_user_has_any_role(array['admin', 'approver'])");
   });
 });

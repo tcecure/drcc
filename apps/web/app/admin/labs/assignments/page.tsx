@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { DashboardNav } from "@/components/organisms/dashboard-nav";
 import { formatLabValue } from "@/lib/labs/queue";
+import { createAssignmentProvisioningJobsAction } from "@/lib/provisioning/actions";
 import { getUserRoles, requireAnyRole, roleManagerRoles } from "@/lib/permissions/roles";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -47,7 +48,17 @@ export default async function LabAssignmentsPage() {
                   <p>{instance?.pod_name ?? "Lab instance"}</p>
                   <p className="text-muted-foreground">{assignment.expires_at ?? "No expiration"}</p>
                 </div>
-                <p className="font-medium capitalize">{formatLabValue(assignment.status)}</p>
+                <div className="flex flex-wrap items-start gap-2">
+                  <p className="font-medium capitalize">{formatLabValue(assignment.status)}</p>
+                  {["reserved", "provisioning"].includes(assignment.status) ? (
+                    <form action={createAssignmentProvisioningJobsAction}>
+                      <input type="hidden" name="assignmentId" value={assignment.id} />
+                      <button className="rounded-md border px-3 py-2 text-sm font-medium hover:bg-muted" type="submit">
+                        Queue provisioning
+                      </button>
+                    </form>
+                  ) : null}
+                </div>
               </article>
             );
           })}

@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { recordAuditEvent } from "@/lib/audit/audit-log";
 import { notifyUser } from "@/lib/notifications/service";
 import { approverRoles, requireAnyRole, requireAuthenticatedUser } from "@/lib/permissions/roles";
+import { createAssignmentProvisioningJobs } from "@/lib/provisioning/jobs";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -484,7 +485,7 @@ export async function acceptLabReservationAction(formData: FormData) {
   await supabase
     .from("lab_assignments")
     .update({
-      status: "reserved",
+      status: "provisioning",
       reserved_at: now,
       starts_at: now,
       expires_at: expiresAt,
@@ -493,7 +494,7 @@ export async function acceptLabReservationAction(formData: FormData) {
   await supabase
     .from("lab_instances")
     .update({
-      status: "reserved",
+      status: "provisioning",
       assigned_user_id: user.id,
       assigned_at: now,
       expires_at: expiresAt,
@@ -510,7 +511,11 @@ export async function acceptLabReservationAction(formData: FormData) {
     entityType: "lab_assignments",
     entityId: assignment.id,
     previousValue: { status: assignment.status },
-    newValue: { status: "reserved", expires_at: expiresAt, provisioning_placeholder: true },
+    newValue: { status: "provisioning", expires_at: expiresAt },
+  });
+  await createAssignmentProvisioningJobs({
+    assignmentId: assignment.id,
+    actorId: user.id,
   });
   await notifyUser({
     userId: user.id,

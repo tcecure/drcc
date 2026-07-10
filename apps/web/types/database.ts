@@ -943,6 +943,130 @@ export type Database = {
         };
         Relationships: [];
       };
+      provisioning_jobs: {
+        Row: {
+          id: string;
+          user_id: string;
+          lab_assignment_id: string | null;
+          job_type:
+            | "create_student_account"
+            | "enable_student_account"
+            | "assign_student_to_pod"
+            | "provision_guacamole_access"
+            | "provision_vpn_access"
+            | "seed_lab"
+            | "verify_lab"
+            | "disable_student_access"
+            | "reset_lab"
+            | "release_pod"
+            | "reset_student_password";
+          status:
+            | "pending_approval"
+            | "approved"
+            | "queued"
+            | "claimed"
+            | "running"
+            | "successful"
+            | "failed"
+            | "cancelled";
+          requested_by: string | null;
+          approved_by: string | null;
+          claimed_by: string | null;
+          external_job_id: string | null;
+          request_payload: Json;
+          result_payload: Json;
+          attempts: number;
+          error_message: string | null;
+          requested_at: string;
+          started_at: string | null;
+          completed_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          lab_assignment_id?: string | null;
+          job_type: Database["public"]["Tables"]["provisioning_jobs"]["Row"]["job_type"];
+          status?: Database["public"]["Tables"]["provisioning_jobs"]["Row"]["status"];
+          requested_by?: string | null;
+          approved_by?: string | null;
+          claimed_by?: string | null;
+          external_job_id?: string | null;
+          request_payload?: Json;
+          result_payload?: Json;
+          attempts?: number;
+          error_message?: string | null;
+          requested_at?: string;
+          started_at?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          lab_assignment_id?: string | null;
+          status?: Database["public"]["Tables"]["provisioning_jobs"]["Row"]["status"];
+          requested_by?: string | null;
+          approved_by?: string | null;
+          claimed_by?: string | null;
+          external_job_id?: string | null;
+          request_payload?: Json;
+          result_payload?: Json;
+          attempts?: number;
+          error_message?: string | null;
+          started_at?: string | null;
+          completed_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "provisioning_jobs_lab_assignment_id_fkey";
+            columns: ["lab_assignment_id"];
+            isOneToOne: false;
+            referencedRelation: "lab_assignments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "provisioning_jobs_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      provisioning_job_events: {
+        Row: {
+          id: string;
+          provisioning_job_id: string;
+          bridge_id: string | null;
+          from_status: string | null;
+          to_status: string;
+          message: string | null;
+          payload: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          provisioning_job_id: string;
+          bridge_id?: string | null;
+          from_status?: string | null;
+          to_status: string;
+          message?: string | null;
+          payload?: Json;
+          created_at?: string;
+        };
+        Update: never;
+        Relationships: [
+          {
+            foreignKeyName: "provisioning_job_events_provisioning_job_id_fkey";
+            columns: ["provisioning_job_id"];
+            isOneToOne: false;
+            referencedRelation: "provisioning_jobs";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: {
