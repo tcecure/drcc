@@ -26,6 +26,18 @@ function formMessage(message: string) {
   return encodeURIComponent(message);
 }
 
+function authErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    if (error.message.includes("Unexpected token") || error.message.includes("not valid JSON")) {
+      return "Authentication service returned an unexpected response. Check the Supabase URL and anon key for this environment.";
+    }
+
+    return error.message;
+  }
+
+  return "Authentication service is unavailable. Check the Supabase configuration.";
+}
+
 export async function signupAction(formData: FormData) {
   const parsed = signupSchema.safeParse({
     fullName: formData.get("fullName"),
@@ -41,23 +53,33 @@ export async function signupAction(formData: FormData) {
     redirect(`/signup?error=${formMessage(parsed.error.issues[0]?.message ?? "Invalid signup request.")}`);
   }
 
-  const env = readPublicEnv();
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
-    email: parsed.data.email,
-    password: parsed.data.password,
-    options: {
-      emailRedirectTo: `${env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-      data: {
-        full_name: parsed.data.fullName,
-        organization: parsed.data.organization,
-        phone: parsed.data.phone ?? "",
-      },
-    },
-  });
+  let authError: string | null = null;
 
-  if (error) {
-    redirect(`/signup?error=${formMessage(error.message)}`);
+  try {
+    const env = readPublicEnv();
+    const supabase = await createClient();
+    const { error } = await supabase.auth.signUp({
+      email: parsed.data.email,
+      password: parsed.data.password,
+      options: {
+        emailRedirectTo: `${env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+        data: {
+          full_name: parsed.data.fullName,
+          organization: parsed.data.organization,
+          phone: parsed.data.phone ?? "",
+        },
+      },
+    });
+
+    if (error) {
+      authError = error.message;
+    }
+  } catch (error) {
+    authError = authErrorMessage(error);
+  }
+
+  if (authError) {
+    redirect(`/signup?error=${formMessage(authError)}`);
   }
 
   redirect(
@@ -76,14 +98,24 @@ export async function loginAction(formData: FormData) {
     redirect(`/login?error=${formMessage(parsed.error.issues[0]?.message ?? "Invalid login request.")}`);
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({
-    email: parsed.data.email,
-    password: parsed.data.password,
-  });
+  let authError: string | null = null;
 
-  if (error) {
-    redirect(`/login?error=${formMessage(error.message)}`);
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.signInWithPassword({
+      email: parsed.data.email,
+      password: parsed.data.password,
+    });
+
+    if (error) {
+      authError = error.message;
+    }
+  } catch (error) {
+    authError = authErrorMessage(error);
+  }
+
+  if (authError) {
+    redirect(`/login?error=${formMessage(authError)}`);
   }
 
   redirect(parsed.data.redirectTo || "/dashboard");
@@ -104,14 +136,24 @@ export async function forgotPasswordAction(formData: FormData) {
     redirect(`/forgot-password?error=${formMessage("Use a valid email address.")}`);
   }
 
-  const env = readPublicEnv();
-  const supabase = await createClient();
-  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-    redirectTo: `${env.NEXT_PUBLIC_APP_URL}/reset-password`,
-  });
+  let authError: string | null = null;
 
-  if (error) {
-    redirect(`/forgot-password?error=${formMessage(error.message)}`);
+  try {
+    const env = readPublicEnv();
+    const supabase = await createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
+      redirectTo: `${env.NEXT_PUBLIC_APP_URL}/reset-password`,
+    });
+
+    if (error) {
+      authError = error.message;
+    }
+  } catch (error) {
+    authError = authErrorMessage(error);
+  }
+
+  if (authError) {
+    redirect(`/forgot-password?error=${formMessage(authError)}`);
   }
 
   redirect(
