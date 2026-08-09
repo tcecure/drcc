@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+dist
+coverage
+playwright-report
+test-results
+work/
+.env
+.env*.local
+!.env.example
+.DS_Store
+* 2.*
