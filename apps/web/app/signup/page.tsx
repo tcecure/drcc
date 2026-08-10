@@ -23,7 +23,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
   return (
     <AuthCard
       title="Create your account"
-      description="Register as a student. Email verification is required before portal access."
+      description="Register as a student. Email verification is required before lab companion access."
       searchParams={params}
       footer={
         <Link className="text-primary hover:underline" href="/login">

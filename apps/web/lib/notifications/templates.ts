@@ -4,6 +4,7 @@ import type { Json } from "@/types/database";
 
 export type EmailTemplateName =
   | "account_registered"
+  | "student_portal_invitation"
   | "access_request_submitted"
   | "more_information_required"
   | "request_approved"
@@ -11,6 +12,7 @@ export type EmailTemplateName =
   | "moodle_enrollment_ready"
   | "moodle_course_completed"
   | "hands_on_eligibility_unlocked"
+  | "lab_window_starting"
   | "lab_request_submitted"
   | "readiness_confirmation_requested"
   | "reservation_offered"
@@ -34,6 +36,12 @@ const templateCopy: Record<EmailTemplateName, { subject: string; title: string; 
     subject: "Your DigitalRCC account was created",
     title: "Account registered",
     message: "Your DigitalRCC account has been created. Verify your email, then sign in to continue.",
+  },
+  student_portal_invitation: {
+    subject: "Your DigitalRCC student portal access",
+    title: "DigitalRCC student access",
+    message:
+      "Your DigitalRCC student access is ready. Use your invitation email to finish account setup, then open the lab dashboard for guides, tools, queue status, and progress tracking.",
   },
   access_request_submitted: {
     subject: "DigitalRCC access request submitted",
@@ -69,6 +77,12 @@ const templateCopy: Record<EmailTemplateName, { subject: string; title: string; 
     subject: "Hands-on lab eligibility unlocked",
     title: "Hands-on eligibility unlocked",
     message: "You can now request hands-on cyber range lab access.",
+  },
+  lab_window_starting: {
+    subject: "Your DigitalRCC lab window starts this week",
+    title: "Lab window starting",
+    message:
+      "Your two-week DigitalRCC lab access window starts this week. Open the lab dashboard to review guides, tools, queue status, and progress expectations.",
   },
   lab_request_submitted: {
     subject: "DigitalRCC lab request submitted",

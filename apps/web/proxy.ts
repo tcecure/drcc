@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
-import { isAuthPath, isProtectedPath } from "@/lib/auth/protected-routes";
+import { isAuthPath, isProtectedPath } from "./lib/auth/protected-routes";
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
@@ -35,7 +35,7 @@ export async function proxy(request: NextRequest) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
 
   if (!user && isProtectedPath(request.nextUrl.pathname)) {
     const redirectUrl = request.nextUrl.clone();

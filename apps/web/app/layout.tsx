@@ -1,32 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 
 import { ThemeProvider } from "@/components/atoms/theme-provider";
 import { SiteShell } from "@/components/templates/site-shell";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://my.digitalrcc.com"),
   title: {
-    default: "DigitalRCC | Digital Resilience Community Clinic",
+    default: "DigitalRCC Lab Companion",
     template: "%s | DigitalRCC",
   },
   description:
-    "Accessible cybersecurity education, hands-on technical experience, and guided security support for students, professionals, small businesses, and community organizations.",
+    "DigitalRCC lab companion for student access requests, queue placement, 14-day hands-on lab windows, progress tracking, and digital lab guides.",
   openGraph: {
-    title: "DigitalRCC | Digital Resilience Community Clinic",
+    title: "DigitalRCC Lab Companion",
     description:
-      "Cybersecurity education, hands-on labs, and community security support.",
+      "Student lab access, queue tracking, guided progress, and digital lab guides.",
     url: "/",
     siteName: "DigitalRCC",
     type: "website",
@@ -46,9 +35,9 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className="h-full antialiased"
     >
-      <body className={`${geistSans.className} flex min-h-full flex-col`}>
+      <body className="flex min-h-full flex-col">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

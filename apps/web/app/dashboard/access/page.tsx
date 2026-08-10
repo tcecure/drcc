@@ -26,7 +26,7 @@ export default async function AccessRequestsPage({ searchParams }: AccessPagePro
         <div>
           <h1 className="text-4xl font-semibold">Access requests</h1>
           <p className="mt-3 max-w-2xl leading-7 text-muted-foreground">
-            Request access to training, labs, protected zones, or elevated portal workflows.
+            Request student lab access, track review status, and enter the hands-on queue after approval.
           </p>
         </div>
         <Link

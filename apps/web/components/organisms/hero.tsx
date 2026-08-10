@@ -21,13 +21,12 @@ export function Hero() {
       <div className="mx-auto grid min-h-[620px] w-full max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
         <div className="relative flex flex-col gap-7">
           <h1 className="max-w-4xl text-4xl leading-tight font-semibold text-balance sm:text-6xl">
-            Welcome to the Digital Resilience Community Clinic
+            DigitalRCC Lab Companion
           </h1>
           <p className="max-w-2xl text-lg leading-8 text-muted-foreground">
-            The Digital Resilience Community Clinic provides accessible
-            cybersecurity education, hands-on technical experience, and guided
-            security support for students, professionals, small businesses, and
-            community organizations.
+            Request lab access, track your queue position, use your 14-day
+            hands-on lab window, monitor progress, and open the digital lab
+            guides for Student01 through Student20.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link
@@ -44,23 +43,23 @@ export function Hero() {
                 "h-11 px-4",
               )}
             >
-              Explore Training
+              View Training Labs
             </Link>
             <Link
-              href="/about"
+              href="/login"
               className={cn(
                 buttonVariants({ variant: "ghost", size: "lg" }),
                 "h-11 px-4",
               )}
             >
-              Learn About the Clinic
+              Student Login
             </Link>
           </div>
         </div>
         <div className="relative min-h-72 lg:min-h-[420px]" aria-hidden="true">
           <div className="absolute inset-0 rounded-lg border bg-card shadow-sm" />
           <div className="absolute inset-6 grid grid-cols-2 gap-4">
-            {["Education", "Labs", "Support", "Readiness"].map((item) => (
+            {["Request", "Queue", "14 Days", "Guides"].map((item) => (
               <div
                 key={item}
                 className="flex items-end rounded-md border bg-background p-4 text-sm font-medium text-muted-foreground"

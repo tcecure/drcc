@@ -141,6 +141,7 @@ export type Database = {
           request_type:
             | "cmmc_level_1_training"
             | "hands_on_lab"
+            | "student_resources"
             | "instructor_access"
             | "customer_delivery_zone"
             | "administrative_access";
@@ -1174,6 +1175,59 @@ export type Database = {
             foreignKeyName: "support_requests_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      student_cohort_assignments: {
+        Row: {
+          id: string;
+          user_id: string;
+          source: string;
+          cohort_number: number;
+          seat_number: number;
+          access_starts_at: string;
+          access_ends_at: string;
+          notification_send_at: string;
+          status: "queued" | "notified" | "active" | "completed" | "cancelled";
+          notified_at: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          source?: string;
+          cohort_number: number;
+          seat_number: number;
+          access_starts_at: string;
+          access_ends_at: string;
+          notification_send_at: string;
+          status?: Database["public"]["Tables"]["student_cohort_assignments"]["Row"]["status"];
+          notified_at?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          source?: string;
+          cohort_number?: number;
+          seat_number?: number;
+          access_starts_at?: string;
+          access_ends_at?: string;
+          notification_send_at?: string;
+          status?: Database["public"]["Tables"]["student_cohort_assignments"]["Row"]["status"];
+          notified_at?: string | null;
+          created_by?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "student_cohort_assignments_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
             referencedRelation: "users";
             referencedColumns: ["id"];
           },

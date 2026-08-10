@@ -9,5 +9,5 @@ test("health endpoint reports application status", async ({ request }) => {
 
   expect(response.ok()).toBe(true);
   expect(body.status).toBe("ok");
-  expect(body.application).toBe("DigitalRCC Portal");
+  expect(body.application).toBe("DigitalRCC Lab Companion");
 });

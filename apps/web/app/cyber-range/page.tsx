@@ -22,8 +22,8 @@ export default function CyberRangePage() {
           <h2 className="text-3xl font-semibold">Hands-on technical experience</h2>
           <p className="mt-4 leading-7 text-muted-foreground">
             The range is built for structured practice, not unrestricted access.
-            Access approvals, safety boundaries, and provisioning controls will
-            be implemented through later portal workflows.
+            Access approvals, safety boundaries, queue placement, and provisioning
+            controls keep the 20-seat hands-on environment stable.
           </p>
         </div>
         <ul className="grid gap-3 sm:grid-cols-2">
@@ -42,17 +42,17 @@ export default function CyberRangePage() {
           <div className="rounded-lg border bg-card p-7 shadow-sm">
             <h2 className="text-2xl font-semibold">Access boundary</h2>
             <p className="mt-4 leading-7 text-muted-foreground">
-              Cyber Range access is separate from normal portal access. Future
-              sprints will connect waitlists, approvals, and lab provisioning
-              through protected server-side workflows.
+              Hands-on access is separate from reading the digital lab guides.
+              Students can study guides at any time, then use their assigned
+              14-day window once a Student01 through Student20 seat is available.
             </p>
           </div>
         </div>
       </section>
       <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
         <CallToAction
-          title="Join the Cyber Range interest list"
-          description="Use pre-registration to indicate lab interest while full account registration and waitlist workflows are being prepared."
+          title="Request a hands-on lab window"
+          description="Submit an access request so an approver can review it and place you into the student lab queue."
           primaryHref="/request-access"
           primaryLabel="Request Access"
           secondaryHref="/training"

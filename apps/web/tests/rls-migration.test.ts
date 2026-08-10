@@ -50,6 +50,21 @@ const customerDeliveryMigration = readFileSync(
   resolve(process.cwd(), "../../supabase/migrations/20260710130000_customer_delivery_zone.sql"),
   "utf8",
 );
+const labCompanionWindowMigration = readFileSync(
+  resolve(process.cwd(), "../../supabase/migrations/20260809110000_lab_companion_14_day_window.sql"),
+  "utf8",
+);
+const labCompanionAccessRequestTypesMigration = readFileSync(
+  resolve(
+    process.cwd(),
+    "../../supabase/migrations/20260809111500_lab_companion_access_request_types.sql",
+  ),
+  "utf8",
+);
+const studentCohortQueueMigration = readFileSync(
+  resolve(process.cwd(), "../../supabase/migrations/20260810110000_student_cohort_queue.sql"),
+  "utf8",
+);
 
 describe("auth profiles roles migration", () => {
   it("enables RLS for user-facing tables", () => {
@@ -182,5 +197,24 @@ describe("auth profiles roles migration", () => {
     expect(customerDeliveryMigration).toContain("members can read assigned customer engagements");
     expect(customerDeliveryMigration).toContain("access_expires_at > now()");
     expect(customerDeliveryMigration).toContain("public.current_user_has_any_role(array['admin', 'approver'])");
+  });
+
+  it("sets the lab companion active window to 14 days", () => {
+    expect(labCompanionWindowMigration).toContain("alter column standard_duration_days set default 14");
+    expect(labCompanionWindowMigration).toContain("set standard_duration_days = 14");
+  });
+
+  it("adds lab companion access request types", () => {
+    expect(labCompanionAccessRequestTypesMigration).toContain(
+      "drop constraint if exists access_requests_request_type_check",
+    );
+    expect(labCompanionAccessRequestTypesMigration).toContain("'student_resources'");
+  });
+
+  it("adds the student cohort queue", () => {
+    expect(studentCohortQueueMigration).toContain("create table if not exists public.student_cohort_assignments");
+    expect(studentCohortQueueMigration).toContain("seat_number between 1 and 20");
+    expect(studentCohortQueueMigration).toContain("students can read their own cohort assignment");
+    expect(studentCohortQueueMigration).toContain("approvers can manage cohort assignments");
   });
 });

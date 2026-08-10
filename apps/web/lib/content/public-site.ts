@@ -17,45 +17,42 @@ import {
 } from "lucide-react";
 
 export const siteUrl =
-  process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://my.digitalrcc.com";
 
 export const publicNavItems = [
-  { href: "/about", label: "About" },
-  { href: "/training", label: "Training" },
-  { href: "/cyber-range", label: "Cyber Range" },
-  { href: "/customer-delivery", label: "Customer Delivery" },
-  { href: "/resources", label: "Resources" },
+  { href: "/training", label: "Training Labs" },
+  { href: "/cyber-range", label: "Lab Access" },
+  { href: "/resources", label: "Guides" },
   { href: "/faq", label: "FAQ" },
-  { href: "/contact", label: "Contact" },
 ];
 
 export const programAreas = [
   {
-    title: "CMMC Level 1 Training",
+    title: "Request Access",
     description:
-      "Learn foundational cybersecurity practices that help organizations protect Federal Contract Information and prepare for readiness conversations.",
-    href: "/training",
+      "Students request lab companion access, verify their account, and enter the hands-on queue.",
+    href: "/request-access",
     icon: ShieldCheck,
   },
   {
-    title: "Cyber Range",
+    title: "Queue Placement",
     description:
-      "Practice in guided technical labs with workstations, servers, monitoring, endpoint protection, and incident response exercises.",
-    href: "/cyber-range",
+      "Approved students are placed into the active lab queue while the 20-seat range is managed.",
+    href: "/dashboard/labs/queue",
     icon: RadioTower,
   },
   {
-    title: "Customer Delivery Zone",
+    title: "14-Day Lab Window",
     description:
-      "Support approved customer assessments, secure collaboration, reporting, and readiness work in an isolated environment.",
-    href: "/customer-delivery",
+      "Students receive a 14-day completion window once their assigned lab slot starts.",
+    href: "/dashboard/labs/current",
     icon: BriefcaseBusiness,
   },
   {
-    title: "Student Resources",
+    title: "Digital Lab Guides",
     description:
-      "Access lab guides, course instructions, troubleshooting materials, templates, references, and career support.",
-    href: "/resources",
+      "Every student can access the digital lab guide library for Student01 through Student20.",
+    href: "/dashboard/labs/guides",
     icon: BookOpen,
   },
 ];
@@ -117,28 +114,28 @@ export const resourcePreviews = [
 
 export const faqs = [
   {
-    question: "Who can use DigitalRCC?",
+    question: "Who can use the DigitalRCC Lab Companion?",
     answer:
-      "DigitalRCC is designed for students, professionals, small businesses, and community organizations that need accessible cybersecurity education or guided security support.",
+      "The lab companion is for students who need guided access to DigitalRCC training labs, queue status, progress tracking, and digital lab guides.",
   },
   {
-    question: "Is the Cyber Range part of normal student access?",
+    question: "How does lab access work?",
     answer:
-      "No. Cyber Range access is approved separately so lab readiness, safety, capacity, and supervision can be managed responsibly.",
+      "Students request access, an approver reviews the request, and approved students are placed into the queue until a Student01 through Student20 lab seat is available.",
   },
   {
-    question: "What is the Customer Delivery Zone?",
+    question: "How long do students have lab access?",
     answer:
-      "It is an isolated environment for approved customer assessments, vulnerability reviews, secure collaboration, reporting, and readiness work. It is not part of normal student access.",
+      "Each active hands-on lab assignment is designed around a 14-day completion window unless an approver grants an exception.",
   },
   {
-    question: "Can I request access before full registration launches?",
+    question: "Can students read the lab guides before they receive a lab seat?",
     answer:
-      "Yes. The current request-access page is an informational pre-registration form. Full account registration is planned for the next sprint.",
+      "Yes. The lab companion includes digital lab guides that any signed-in student can use while waiting for hands-on access.",
   },
   {
-    question: "Does DigitalRCC provide CMMC certification?",
+    question: "Why are there only 20 lab seats?",
     answer:
-      "DigitalRCC provides education, readiness support, and practical guidance. Certification and formal assessment decisions remain with authorized assessment paths.",
+      "The hands-on Proxmox environment is built for 20 concurrent student seats, so access is queued to keep each active lab stable and supportable.",
   },
 ];

@@ -29,6 +29,9 @@ export function DashboardNav({ roles }: { roles: PortalRole[] }) {
       <Link className="rounded-md px-3 py-2 text-sm font-medium hover:bg-muted" href="/dashboard/labs">
         Labs
       </Link>
+      <Link className="rounded-md px-3 py-2 text-sm font-medium hover:bg-muted" href="/dashboard/labs/guides">
+        Guides
+      </Link>
       <Link className="rounded-md px-3 py-2 text-sm font-medium hover:bg-muted" href="/dashboard/notifications">
         Notifications
       </Link>

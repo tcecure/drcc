@@ -8,7 +8,6 @@ export const requestAccessSchema = z.object({
     "cmmc_level_1_training",
     "hands_on_lab",
     "student_resources",
-    "customer_delivery_zone",
   ]),
   message: z.string().trim().min(20, "Share at least 20 characters about your interest."),
 });
@@ -24,7 +23,7 @@ export const signupSchema = z
     password: z.string().min(8, "Password must be at least 8 characters."),
     passwordConfirmation: z.string().min(8),
     policyAccepted: z.literal("on", {
-      error: "You must accept the portal policy.",
+      error: "You must accept the lab companion policy.",
     }),
   })
   .refine((data) => data.password === data.passwordConfirmation, {
@@ -73,9 +72,7 @@ export const accessRequestFormSchema = z.object({
   requestType: z.enum([
     "cmmc_level_1_training",
     "hands_on_lab",
-    "instructor_access",
-    "customer_delivery_zone",
-    "administrative_access",
+    "student_resources",
   ]),
   requestedProgram: z.string().trim().min(2, "Requested program is required."),
   reason: z.string().trim().min(20, "Share at least 20 characters about why you need access."),

@@ -18,7 +18,7 @@ export function AccessRequestForm({ action, request }: AccessRequestFormProps) {
         <select
           className="h-11 rounded-md border bg-background px-3 text-sm"
           name="requestType"
-          defaultValue={request?.request_type ?? "cmmc_level_1_training"}
+          defaultValue={request?.request_type ?? "hands_on_lab"}
           required
         >
           {requestTypeOptions.map((option) => (
@@ -34,7 +34,7 @@ export function AccessRequestForm({ action, request }: AccessRequestFormProps) {
           className="h-11 rounded-md border bg-background px-3 text-sm"
           name="requestedProgram"
           defaultValue={request?.requested_program ?? ""}
-          placeholder="DigitalRCC cyber range, CMMC training, or another program"
+          placeholder="DigitalRCC hands-on lab, lab guides, or CMMC training"
           required
         />
       </label>
@@ -68,6 +68,7 @@ export function AccessRequestForm({ action, request }: AccessRequestFormProps) {
           className="min-h-32 rounded-md border bg-background px-3 py-2 text-sm"
           name="reason"
           defaultValue={request?.reason ?? ""}
+          placeholder="Share your training goal and when you expect to be ready for a 14-day lab window."
           required
         />
       </label>
@@ -77,6 +78,7 @@ export function AccessRequestForm({ action, request }: AccessRequestFormProps) {
           className="min-h-24 rounded-md border bg-background px-3 py-2 text-sm"
           name="availabilityNotes"
           defaultValue={request?.availability_notes ?? ""}
+          placeholder="Add preferred start dates, schedule constraints, or support needs."
         />
       </label>
       <div className="flex flex-col gap-3 sm:flex-row">

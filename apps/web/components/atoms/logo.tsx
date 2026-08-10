@@ -15,7 +15,7 @@ export function Logo() {
       </span>
       <span className="flex flex-col leading-none">
         <span className="text-base font-semibold">DigitalRCC</span>
-        <span className="text-xs text-muted-foreground">Portal</span>
+        <span className="text-xs text-muted-foreground">Lab Companion</span>
       </span>
     </Link>
   );

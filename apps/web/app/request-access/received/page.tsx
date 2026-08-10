@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Request Received",
-  description: "DigitalRCC pre-registration interest received.",
+  description: "DigitalRCC lab access request received.",
 };
 
 export default function RequestAccessReceivedPage() {
@@ -15,7 +15,7 @@ export default function RequestAccessReceivedPage() {
           We have received your request.
         </h1>
         <p className="mt-4 leading-7 text-muted-foreground">
-          Thank you for sharing your DigitalRCC interest. The clinic team will
+          Thank you for requesting DigitalRCC lab access. An approver will
           review your submission and follow up using the contact email provided.
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -29,7 +29,7 @@ export default function RequestAccessReceivedPage() {
             className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
             href="/signup"
           >
-            Create a portal account
+            Create a student account
           </Link>
         </div>
       </section>

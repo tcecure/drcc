@@ -11,7 +11,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
   title: "Admin",
-  description: "DigitalRCC administrative portal.",
+  description: "DigitalRCC lab companion administration.",
 };
 
 export default async function AdminPage() {
@@ -28,7 +28,7 @@ export default async function AdminPage() {
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8">
       <DashboardNav roles={roles} />
       <section>
-        <h1 className="text-4xl font-semibold">Admin portal</h1>
+        <h1 className="text-4xl font-semibold">Admin workspace</h1>
         <p className="mt-4 max-w-3xl leading-7 text-muted-foreground">
           Manage account status and role assignments. Request submissions are
           reviewed by admins and approvers from the approvals workspace.
@@ -66,6 +66,18 @@ export default async function AdminPage() {
           </Link>
           <Link
             className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
+            href="/admin/students/queue"
+          >
+            Student queue
+          </Link>
+          <Link
+            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
+            href="/admin/students/import"
+          >
+            Import students
+          </Link>
+          <Link
+            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
             href="/admin/email-jobs"
           >
             Email jobs
@@ -87,12 +99,6 @@ export default async function AdminPage() {
             href="/admin/support"
           >
             Support
-          </Link>
-          <Link
-            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
-            href="/admin/customer-delivery"
-          >
-            Customer Delivery
           </Link>
         </div>
       </section>

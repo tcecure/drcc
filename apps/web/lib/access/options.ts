@@ -7,11 +7,9 @@ export const requestTypeOptions: Array<{
   value: AccessRequest["request_type"];
   label: string;
 }> = [
+  { value: "hands_on_lab", label: "Hands-on training lab" },
+  { value: "student_resources", label: "Digital lab guides" },
   { value: "cmmc_level_1_training", label: "CMMC Level 1 training" },
-  { value: "hands_on_lab", label: "Hands-on lab" },
-  { value: "instructor_access", label: "Instructor access" },
-  { value: "customer_delivery_zone", label: "Customer Delivery Zone" },
-  { value: "administrative_access", label: "Administrative access" },
 ];
 
 export const experienceLevelOptions: Array<{

@@ -1,6 +1,6 @@
-# DigitalRCC Portal
+# DigitalRCC Lab Companion
 
-DigitalRCC is the Digital Resilience Community Clinic Portal: a unified public website, student portal, administrative portal, resource library, training approval system, Moodle enrollment manager, cyber range waitlist, and lab provisioning controller.
+DigitalRCC Lab Companion is the internally focused student experience for `my.digitalrcc.com`. It handles lab access requests, queue placement, 14-day hands-on lab windows, progress monitoring, support requests, and digital lab guides for Student01 through Student20.
 
 ## Stack
 
@@ -23,7 +23,7 @@ docs/security
 docs/workflows
 ```
 
-The current implementation keeps the web app in `apps/web` so the portal can grow into additional apps or services without moving the first production surface.
+The current implementation keeps the web app in `apps/web` so the lab companion can grow into adjacent internal services without moving the first production surface.
 
 ## Environment
 
@@ -33,7 +33,7 @@ Copy `.env.example` to `apps/web/.env.local` for local development.
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
-NEXT_PUBLIC_APP_URL=
+NEXT_PUBLIC_APP_URL=https://my.digitalrcc.com
 ```
 
 Never expose `SUPABASE_SERVICE_ROLE_KEY` in client code. Infrastructure systems such as Moodle, AWX, Active Directory, VPN, Guacamole, and lab controllers must only be reached by server-side code or an internal integration bridge.

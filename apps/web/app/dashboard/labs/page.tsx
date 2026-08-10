@@ -45,6 +45,7 @@ export default async function LabsDashboardPage() {
         <DashboardLink href="/dashboard/labs/queue" title="Queue" description="View your waitlist status and current position." />
         <DashboardLink href="/dashboard/labs/reservation" title="Reservation" description="Accept or decline offered lab reservations." />
         <DashboardLink href="/dashboard/labs/current" title="Current lab" description="Review active or reserved lab access." />
+        <DashboardLink href="/dashboard/labs/guides" title="Guides" description="Open the digital lab guides for Student01 through Student20." />
         <DashboardLink href="/dashboard/labs/history" title="History" description="Review previous lab requests and outcomes." />
         <DashboardLink href="/dashboard/support" title="Support" description="Open or track lab support requests." />
       </section>

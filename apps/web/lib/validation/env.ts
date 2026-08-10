@@ -20,6 +20,7 @@ export const envSchema = z.object({
   BRIDGE_ID: z.string().optional(),
   BRIDGE_SECRET: z.string().optional(),
   INTEGRATION_MODE: z.enum(["mock", "live"]).default("mock"),
+  CRON_SECRET: z.string().optional(),
 });
 
 export const publicEnvSchema = envSchema.pick({
@@ -70,5 +71,6 @@ export function readServerEnv() {
     BRIDGE_ID: process.env.BRIDGE_ID,
     BRIDGE_SECRET: process.env.BRIDGE_SECRET,
     INTEGRATION_MODE: process.env.INTEGRATION_MODE,
+    CRON_SECRET: process.env.CRON_SECRET,
   });
 }

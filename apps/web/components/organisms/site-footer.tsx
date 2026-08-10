@@ -6,14 +6,12 @@ export function SiteFooter() {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 py-8 text-sm text-muted-foreground sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <p className="max-w-xl">
-            DigitalRCC helps students and community organizations build
-            practical cybersecurity resilience.
+            DigitalRCC helps students request lab access, follow digital guides,
+            and complete hands-on cybersecurity training.
           </p>
           <FooterNavigation />
         </div>
-        <p className="text-xs">
-          Customer Delivery Zone access is isolated from normal student access.
-        </p>
+        <p className="text-xs">Hands-on lab access is queued for 20 concurrent student seats.</p>
       </div>
     </footer>
   );

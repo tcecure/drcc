@@ -7,7 +7,7 @@ import { loginAction } from "@/lib/auth/actions";
 
 export const metadata: Metadata = {
   title: "Log In",
-  description: "Log in to the DigitalRCC portal.",
+  description: "Log in to the DigitalRCC lab companion.",
 };
 
 type LoginPageProps = {
@@ -24,7 +24,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <AuthCard
       title="Log in"
-      description="Access your DigitalRCC dashboard, profile, and role-aware portal tools."
+      description="Access your DigitalRCC lab dashboard, queue status, progress, and digital guides."
       searchParams={params}
       footer={
         <div className="flex flex-col gap-2">

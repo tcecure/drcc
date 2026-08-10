@@ -7,14 +7,13 @@ import { submitPreRegistrationInterestAction } from "@/lib/access/actions";
 export const metadata: Metadata = {
   title: "Request Access",
   description:
-    "Submit an informational DigitalRCC pre-registration request for training, cyber range interest, resources, or administrative follow-up.",
+    "Submit a DigitalRCC lab companion access request for student training labs.",
 };
 
 const interests = [
-  { label: "CMMC Level 1 Training", value: "cmmc_level_1_training" },
-  { label: "Cyber Range", value: "hands_on_lab" },
-  { label: "Student Resources", value: "student_resources" },
-  { label: "Customer Delivery Support", value: "customer_delivery_zone" },
+  { label: "CMMC Level 1 training", value: "cmmc_level_1_training" },
+  { label: "Training labs - Coming soon", value: "hands_on_lab" },
+  { label: "Digital lab guides - Coming soon", value: "student_resources" },
 ];
 
 type RequestAccessPageProps = {
@@ -33,19 +32,19 @@ export default async function RequestAccessPage({
     <main className="flex flex-1 flex-col">
       <PageHeader
         title="Request Access"
-        description="This public pre-registration form helps the clinic understand your interest and follow up with the right next step."
+        description="Request student access to the DigitalRCC lab companion. Approved students are queued for a 14-day hands-on training lab window."
       />
       <section className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
         <aside className="rounded-lg border bg-card p-6 shadow-sm">
           <h2 className="text-xl font-semibold">Before you submit</h2>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            You do not need an account to send interest. If you already have an
-            account, use the dashboard access request workflow for formal review.
+            You do not need an account to send the first request. After review,
+            an approver will help move you into the student queue.
           </p>
           <ul className="mt-5 flex flex-col gap-3 text-sm text-muted-foreground">
             <li>Use your best contact email.</li>
-            <li>Select the program area closest to your need.</li>
-            <li>Do not include sensitive customer data.</li>
+            <li>Select the lab need closest to your request.</li>
+            <li>Do not include passwords, private keys, or sensitive data.</li>
           </ul>
         </aside>
         <form
@@ -120,7 +119,7 @@ export default async function RequestAccessPage({
               <textarea
                 className="min-h-32 rounded-md border bg-background px-3 py-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                 name="message"
-                placeholder="Share a brief note about your training, lab, resource, or support needs."
+                placeholder="Share a brief note about your training goal, lab readiness, or guide needs."
                 required
               />
             </label>
@@ -128,7 +127,7 @@ export default async function RequestAccessPage({
               type="submit"
               className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
-              Submit pre-registration interest
+              Submit access request
             </button>
             <p className="text-xs leading-5 text-muted-foreground">
               Already have an account?{" "}

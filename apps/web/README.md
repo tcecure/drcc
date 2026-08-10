@@ -1,10 +1,10 @@
-# DigitalRCC Web App
+# DigitalRCC Lab Companion Web App
 
-This is the Next.js App Router application for the Digital Resilience Community Clinic Portal.
+This is the Next.js App Router application for the `my.digitalrcc.com` lab companion.
 
 ## Feature Notes
 
-- `app/` contains public routes, protected dashboard/admin placeholders, and route handlers.
+- `app/` contains the lab companion request, queue, active lab, guide, support, dashboard, admin, and route handler surfaces.
 - `components/atoms`, `components/molecules`, `components/organisms`, and `components/templates` follow Atomic Design.
 - `lib/supabase` contains browser, server, and service-role Supabase client factories.
 - `lib/validation` contains Zod schemas for environment and form validation.

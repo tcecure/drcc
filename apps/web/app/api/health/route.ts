@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 export function GET() {
   return NextResponse.json({
     status: "ok",
-    application: "DigitalRCC Portal",
+    application: "DigitalRCC Lab Companion",
     environment: process.env.NODE_ENV ?? "development",
     timestamp: new Date().toISOString(),
   });

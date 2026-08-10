@@ -104,8 +104,8 @@ export default async function CurrentLabPage({ searchParams }: CurrentLabPagePro
                     <p className="mt-2 text-muted-foreground">
                       Follow the assigned DigitalRCC lab guide in the resources area. Keep acceptable use rules active for every session.
                     </p>
-                    <Link className="mt-3 inline-flex font-medium text-primary hover:underline" href="/dashboard/resources">
-                      Open resources
+                    <Link className="mt-3 inline-flex font-medium text-primary hover:underline" href="/dashboard/labs/guides">
+                      Open digital guides
                     </Link>
                   </div>
                   <div className="mt-5 rounded-md border bg-background p-4">
