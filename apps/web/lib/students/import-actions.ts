@@ -39,11 +39,15 @@ export async function importStudentsCsvAction(formData: FormData) {
   const file = formData.get("csvFile");
 
   if (!(file instanceof File) || file.size === 0) {
-    redirect(`/admin/students/import?error=${formMessage("Upload a CSV file with name and email columns.")}`);
+    redirect(
+      `/admin/students/import?error=${formMessage("Upload a CSV file with name and email columns.")}`,
+    );
   }
 
   if (file.size > 1024 * 1024) {
-    redirect(`/admin/students/import?error=${formMessage("CSV file must be 1 MB or smaller.")}`);
+    redirect(
+      `/admin/students/import?error=${formMessage("CSV file must be 1 MB or smaller.")}`,
+    );
   }
 
   let rows: StudentImportRow[];
@@ -57,18 +61,13 @@ export async function importStudentsCsvAction(formData: FormData) {
   }
 
   if (rows.length === 0) {
-    redirect(`/admin/students/import?error=${formMessage("No valid student rows found in the CSV.")}`);
+    redirect(
+      `/admin/students/import?error=${formMessage("No valid student rows found in the CSV.")}`,
+    );
   }
 
   const result = await importStudentRows(rows, actor.id);
-  const summary = [
-    `${result.invited} invited`,
-    `${result.updated} updated`,
-    `${result.scheduled} scheduled`,
-    result.failed.length ? `${result.failed.length} failed` : null,
-  ]
-    .filter(Boolean)
-    .join(", ");
+  const summary = formatImportSummary(result);
 
   await recordAuditEvent({
     actorId: actor.id,
@@ -87,13 +86,68 @@ export async function importStudentsCsvAction(formData: FormData) {
   revalidatePath("/admin");
   revalidatePath("/admin/email-jobs");
   revalidatePath("/admin/students/import");
-  redirect(`/admin/students/import?message=${formMessage(`Student import complete: ${summary}.`)}`);
+  redirect(
+    `/admin/students/import?message=${formMessage(`Student import complete: ${summary}.`)}`,
+  );
 }
 
-async function importStudentRows(rows: StudentImportRow[], actorId: string): Promise<StudentImportResult> {
+export async function importStudentsManualAction(formData: FormData) {
+  const actor = await requireAuthenticatedUser();
+  await requireAnyRole(roleManagerRoles);
+
+  let rows: StudentImportRow[];
+
+  try {
+    rows = parseManualStudentRows(formData);
+  } catch (error) {
+    redirect(
+      `/admin/students/import?error=${formMessage(error instanceof Error ? error.message : "Manual student entries could not be parsed.")}`,
+    );
+  }
+
+  if (rows.length === 0) {
+    redirect(
+      `/admin/students/import?error=${formMessage("Add at least one student name and email.")}`,
+    );
+  }
+
+  const result = await importStudentRows(rows, actor.id);
+  const summary = formatImportSummary(result);
+
+  await recordAuditEvent({
+    actorId: actor.id,
+    action: "student_manual_imported",
+    entityType: "student_imports",
+    previousValue: null,
+    newValue: {
+      submitted_rows: rows.length,
+      invited: result.invited,
+      updated: result.updated,
+      scheduled: result.scheduled,
+      failed: result.failed,
+    },
+  });
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/email-jobs");
+  revalidatePath("/admin/students/import");
+  redirect(
+    `/admin/students/import?message=${formMessage(`Manual student import complete: ${summary}.`)}`,
+  );
+}
+
+async function importStudentRows(
+  rows: StudentImportRow[],
+  actorId: string,
+): Promise<StudentImportResult> {
   const env = readServerEnv();
   const supabase = createAdminClient();
-  const result: StudentImportResult = { invited: 0, updated: 0, scheduled: 0, failed: [] };
+  const result: StudentImportResult = {
+    invited: 0,
+    updated: 0,
+    scheduled: 0,
+    failed: [],
+  };
   const { data: studentRole } = await supabase
     .from("roles")
     .select("id")
@@ -111,13 +165,16 @@ async function importStudentRows(rows: StudentImportRow[], actorId: string): Pro
       let invited = false;
 
       if (!userId) {
-        const { data, error } = await supabase.auth.admin.inviteUserByEmail(row.email, {
-          data: {
-            full_name: row.fullName,
-            organization: "DigitalRCC Student",
+        const { data, error } = await supabase.auth.admin.inviteUserByEmail(
+          row.email,
+          {
+            data: {
+              full_name: row.fullName,
+              organization: "DigitalRCC Student",
+            },
+            redirectTo: `${env.NEXT_PUBLIC_APP_URL}/auth/callback`,
           },
-          redirectTo: `${env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-        });
+        );
 
         if (error) {
           throw new Error(error.message);
@@ -139,13 +196,16 @@ async function importStudentRows(rows: StudentImportRow[], actorId: string): Pro
         account_status: "active",
       });
 
-      await supabase.from("user_roles").upsert({
-        user_id: userId,
-        role_id: studentRole.id,
-        assigned_by: actorId,
-      }, {
-        onConflict: "user_id,role_id",
-      });
+      await supabase.from("user_roles").upsert(
+        {
+          user_id: userId,
+          role_id: studentRole.id,
+          assigned_by: actorId,
+        },
+        {
+          onConflict: "user_id,role_id",
+        },
+      );
 
       await queueStudentPortalEmail({
         userId,
@@ -169,12 +229,24 @@ async function importStudentRows(rows: StudentImportRow[], actorId: string): Pro
     } catch (error) {
       result.failed.push({
         email: row.email,
-        reason: error instanceof Error ? error.message : "Unknown import error.",
+        reason:
+          error instanceof Error ? error.message : "Unknown import error.",
       });
     }
   }
 
   return result;
+}
+
+function formatImportSummary(result: StudentImportResult) {
+  return [
+    `${result.invited} invited`,
+    `${result.updated} updated`,
+    `${result.scheduled} scheduled`,
+    result.failed.length ? `${result.failed.length} failed` : null,
+  ]
+    .filter(Boolean)
+    .join(", ");
 }
 
 async function findExistingProfile(email: string) {
@@ -230,7 +302,8 @@ async function queueStudentPortalEmail({
     user_id: userId,
     notification_type: "student_portal_invitation",
     title: "DigitalRCC student access",
-    message: "Your student access is ready. Open the lab dashboard for guides, tools, queue status, and progress tracking.",
+    message:
+      "Your student access is ready. Open the lab dashboard for guides, tools, queue status, and progress tracking.",
     action_url: actionUrl,
   });
 
@@ -256,17 +329,23 @@ function parseStudentCsv(input: string): StudentImportRow[] {
   }
 
   const firstRow = lines[0].map(normalizeHeader);
-  const hasHeader = firstRow.includes("email") && (
-    firstRow.some((header) => ["name", "full_name", "user_name"].includes(header)) ||
-    (firstRow.includes("first_name") && firstRow.includes("last_name"))
-  );
+  const hasHeader =
+    firstRow.includes("email") &&
+    (firstRow.some((header) =>
+      ["name", "full_name", "user_name"].includes(header),
+    ) ||
+      (firstRow.includes("first_name") && firstRow.includes("last_name")));
   const emailIndex = hasHeader ? firstRow.indexOf("email") : 1;
   const nameIndex = hasHeader
-    ? firstRow.findIndex((header) => ["name", "full_name", "user_name"].includes(header))
+    ? firstRow.findIndex((header) =>
+        ["name", "full_name", "user_name"].includes(header),
+      )
     : 0;
   const firstNameIndex = hasHeader ? firstRow.indexOf("first_name") : -1;
   const lastNameIndex = hasHeader ? firstRow.indexOf("last_name") : -1;
-  const bookingStatusIndex = hasHeader ? firstRow.indexOf("booking_status") : -1;
+  const bookingStatusIndex = hasHeader
+    ? firstRow.indexOf("booking_status")
+    : -1;
   const dataRows = hasHeader ? lines.slice(1) : lines;
   const rows = dataRows
     .filter((line) => {
@@ -274,19 +353,26 @@ function parseStudentCsv(input: string): StudentImportRow[] {
         return true;
       }
 
-      return String(line[bookingStatusIndex] ?? "").trim().toLowerCase() === "confirmed";
+      return (
+        String(line[bookingStatusIndex] ?? "")
+          .trim()
+          .toLowerCase() === "confirmed"
+      );
     })
     .map((line) => {
-      const fullName = nameIndex >= 0
-        ? String(line[nameIndex] ?? "").trim()
-        : [line[firstNameIndex], line[lastNameIndex]]
-            .map((value) => String(value ?? "").trim())
-            .filter(Boolean)
-            .join(" ");
+      const fullName =
+        nameIndex >= 0
+          ? String(line[nameIndex] ?? "").trim()
+          : [line[firstNameIndex], line[lastNameIndex]]
+              .map((value) => String(value ?? "").trim())
+              .filter(Boolean)
+              .join(" ");
 
       return {
         fullName,
-        email: String(line[emailIndex] ?? "").trim().toLowerCase(),
+        email: String(line[emailIndex] ?? "")
+          .trim()
+          .toLowerCase(),
       };
     })
     .filter((row) => row.fullName || row.email);
@@ -312,6 +398,39 @@ function parseStudentCsv(input: string): StudentImportRow[] {
   }
 
   return valid;
+}
+
+function parseManualStudentRows(formData: FormData): StudentImportRow[] {
+  const seen = new Set<string>();
+  const rows: StudentImportRow[] = [];
+
+  for (let index = 0; index < 10; index += 1) {
+    const fullName = String(formData.get(`studentName-${index}`) ?? "").trim();
+    const email = String(formData.get(`studentEmail-${index}`) ?? "")
+      .trim()
+      .toLowerCase();
+
+    if (!fullName && !email) {
+      continue;
+    }
+
+    if (!fullName || !email) {
+      throw new Error(`Manual row ${index + 1} is missing a name or email.`);
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new Error(`Manual row ${index + 1} has an invalid email address.`);
+    }
+
+    if (seen.has(email)) {
+      continue;
+    }
+
+    seen.add(email);
+    rows.push({ fullName, email });
+  }
+
+  return rows;
 }
 
 function parseCsv(input: string) {
