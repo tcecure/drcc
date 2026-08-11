@@ -3,14 +3,23 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { isAuthPath, isProtectedPath } from "./lib/auth/protected-routes";
 
+function envValue(value: string | undefined) {
+  return value?.trim() || undefined;
+}
+
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request,
   });
 
   const supabaseUrl =
-    process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    envValue(process.env.NEXT_PUBLIC_SUPABASE_URL) ??
+    envValue(process.env.SUPABASE_URL);
+  const supabaseAnonKey =
+    envValue(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) ??
+    envValue(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) ??
+    envValue(process.env.SUPABASE_ANON_KEY) ??
+    envValue(process.env.SUPABASE_PUBLISHABLE_KEY);
 
   if (!supabaseUrl || !supabaseAnonKey) {
     return response;
