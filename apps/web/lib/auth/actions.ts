@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { recordAuditEvent } from "@/lib/audit/audit-log";
+import { formMessage, friendlyAuthErrorMessage } from "@/lib/auth/errors";
 import {
   requireAnyRole,
   requireAuthenticatedUser,
@@ -22,22 +23,6 @@ import {
   signupSchema,
 } from "@/lib/validation/forms";
 
-function formMessage(message: string) {
-  return encodeURIComponent(message);
-}
-
-function authErrorMessage(error: unknown) {
-  if (error instanceof Error) {
-    if (error.message.includes("Unexpected token") || error.message.includes("not valid JSON")) {
-      return "Authentication service returned an unexpected response. Check the Supabase URL and anon key for this environment.";
-    }
-
-    return error.message;
-  }
-
-  return "Authentication service is unavailable. Check the Supabase configuration.";
-}
-
 export async function signupAction(formData: FormData) {
   const parsed = signupSchema.safeParse({
     fullName: formData.get("fullName"),
@@ -50,7 +35,9 @@ export async function signupAction(formData: FormData) {
   });
 
   if (!parsed.success) {
-    redirect(`/signup?error=${formMessage(parsed.error.issues[0]?.message ?? "Invalid signup request.")}`);
+    redirect(
+      `/signup?error=${formMessage(parsed.error.issues[0]?.message ?? "Invalid signup request.")}`,
+    );
   }
 
   let authError: string | null = null;
@@ -72,10 +59,10 @@ export async function signupAction(formData: FormData) {
     });
 
     if (error) {
-      authError = error.message;
+      authError = friendlyAuthErrorMessage(error);
     }
   } catch (error) {
-    authError = authErrorMessage(error);
+    authError = friendlyAuthErrorMessage(error);
   }
 
   if (authError) {
@@ -95,7 +82,9 @@ export async function loginAction(formData: FormData) {
   });
 
   if (!parsed.success) {
-    redirect(`/login?error=${formMessage(parsed.error.issues[0]?.message ?? "Invalid login request.")}`);
+    redirect(
+      `/login?error=${formMessage(parsed.error.issues[0]?.message ?? "Invalid login request.")}`,
+    );
   }
 
   let authError: string | null = null;
@@ -108,10 +97,10 @@ export async function loginAction(formData: FormData) {
     });
 
     if (error) {
-      authError = error.message;
+      authError = friendlyAuthErrorMessage(error);
     }
   } catch (error) {
-    authError = authErrorMessage(error);
+    authError = friendlyAuthErrorMessage(error);
   }
 
   if (authError) {
@@ -133,7 +122,9 @@ export async function forgotPasswordAction(formData: FormData) {
   });
 
   if (!parsed.success) {
-    redirect(`/forgot-password?error=${formMessage("Use a valid email address.")}`);
+    redirect(
+      `/forgot-password?error=${formMessage("Use a valid email address.")}`,
+    );
   }
 
   let authError: string | null = null;
@@ -141,15 +132,18 @@ export async function forgotPasswordAction(formData: FormData) {
   try {
     const env = readPublicEnv();
     const supabase = await createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-      redirectTo: `${env.NEXT_PUBLIC_APP_URL}/reset-password`,
-    });
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      parsed.data.email,
+      {
+        redirectTo: `${env.NEXT_PUBLIC_APP_URL}/reset-password`,
+      },
+    );
 
     if (error) {
-      authError = error.message;
+      authError = friendlyAuthErrorMessage(error);
     }
   } catch (error) {
-    authError = authErrorMessage(error);
+    authError = friendlyAuthErrorMessage(error);
   }
 
   if (authError) {
@@ -168,7 +162,9 @@ export async function resetPasswordAction(formData: FormData) {
   });
 
   if (!parsed.success) {
-    redirect(`/reset-password?error=${formMessage(parsed.error.issues[0]?.message ?? "Invalid password reset request.")}`);
+    redirect(
+      `/reset-password?error=${formMessage(parsed.error.issues[0]?.message ?? "Invalid password reset request.")}`,
+    );
   }
 
   const supabase = await createClient();
@@ -177,10 +173,14 @@ export async function resetPasswordAction(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/reset-password?error=${formMessage(error.message)}`);
+    redirect(
+      `/reset-password?error=${formMessage(friendlyAuthErrorMessage(error))}`,
+    );
   }
 
-  redirect(`/login?message=${formMessage("Password updated. Sign in with your new password.")}`);
+  redirect(
+    `/login?message=${formMessage("Password updated. Sign in with your new password.")}`,
+  );
 }
 
 export async function updateProfileAction(formData: FormData) {
@@ -192,7 +192,9 @@ export async function updateProfileAction(formData: FormData) {
   });
 
   if (!parsed.success) {
-    redirect(`/dashboard/profile?error=${formMessage("Profile update failed. Check required fields.")}`);
+    redirect(
+      `/dashboard/profile?error=${formMessage("Profile update failed. Check required fields.")}`,
+    );
   }
 
   const supabase = await createClient();
@@ -222,7 +224,9 @@ export async function assignRoleAction(formData: FormData) {
   });
 
   if (!parsed.success || parsed.data.userId === actor.id) {
-    redirect(`/admin/users/${formData.get("userId")}/roles?error=${formMessage("Role assignment is not allowed.")}`);
+    redirect(
+      `/admin/users/${formData.get("userId")}/roles?error=${formMessage("Role assignment is not allowed.")}`,
+    );
   }
 
   const supabase = createAdminClient();
@@ -233,7 +237,9 @@ export async function assignRoleAction(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/admin/users/${parsed.data.userId}/roles?error=${formMessage(error.message)}`);
+    redirect(
+      `/admin/users/${parsed.data.userId}/roles?error=${formMessage(error.message)}`,
+    );
   }
 
   await recordAuditEvent({
@@ -245,7 +251,9 @@ export async function assignRoleAction(formData: FormData) {
   });
 
   revalidatePath(`/admin/users/${parsed.data.userId}/roles`);
-  redirect(`/admin/users/${parsed.data.userId}/roles?message=${formMessage("Role assigned.")}`);
+  redirect(
+    `/admin/users/${parsed.data.userId}/roles?message=${formMessage("Role assigned.")}`,
+  );
 }
 
 export async function removeRoleAction(formData: FormData) {
@@ -257,7 +265,9 @@ export async function removeRoleAction(formData: FormData) {
   });
 
   if (!parsed.success || parsed.data.userId === actor.id) {
-    redirect(`/admin/users/${formData.get("userId")}/roles?error=${formMessage("Role removal is not allowed.")}`);
+    redirect(
+      `/admin/users/${formData.get("userId")}/roles?error=${formMessage("Role removal is not allowed.")}`,
+    );
   }
 
   const supabase = createAdminClient();
@@ -268,7 +278,9 @@ export async function removeRoleAction(formData: FormData) {
     .eq("role_id", parsed.data.roleId);
 
   if (error) {
-    redirect(`/admin/users/${parsed.data.userId}/roles?error=${formMessage(error.message)}`);
+    redirect(
+      `/admin/users/${parsed.data.userId}/roles?error=${formMessage(error.message)}`,
+    );
   }
 
   await recordAuditEvent({
@@ -280,7 +292,9 @@ export async function removeRoleAction(formData: FormData) {
   });
 
   revalidatePath(`/admin/users/${parsed.data.userId}/roles`);
-  redirect(`/admin/users/${parsed.data.userId}/roles?message=${formMessage("Role removed.")}`);
+  redirect(
+    `/admin/users/${parsed.data.userId}/roles?message=${formMessage("Role removed.")}`,
+  );
 }
 
 export async function updateAccountStatusAction(formData: FormData) {
@@ -292,7 +306,9 @@ export async function updateAccountStatusAction(formData: FormData) {
   });
 
   if (!parsed.success) {
-    redirect(`/admin/users/${formData.get("userId")}/roles?error=${formMessage("Invalid account status.")}`);
+    redirect(
+      `/admin/users/${formData.get("userId")}/roles?error=${formMessage("Invalid account status.")}`,
+    );
   }
 
   const supabase = createAdminClient();
@@ -308,7 +324,9 @@ export async function updateAccountStatusAction(formData: FormData) {
     .eq("id", parsed.data.userId);
 
   if (error) {
-    redirect(`/admin/users/${parsed.data.userId}/roles?error=${formMessage(error.message)}`);
+    redirect(
+      `/admin/users/${parsed.data.userId}/roles?error=${formMessage(error.message)}`,
+    );
   }
 
   await recordAuditEvent({
@@ -323,5 +341,7 @@ export async function updateAccountStatusAction(formData: FormData) {
   });
 
   revalidatePath(`/admin/users/${parsed.data.userId}/roles`);
-  redirect(`/admin/users/${parsed.data.userId}/roles?message=${formMessage("Account status updated.")}`);
+  redirect(
+    `/admin/users/${parsed.data.userId}/roles?message=${formMessage("Account status updated.")}`,
+  );
 }

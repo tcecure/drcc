@@ -2,6 +2,7 @@ import "server-only";
 
 import { redirect } from "next/navigation";
 
+import { formMessage, friendlyAuthErrorMessage } from "@/lib/auth/errors";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 
@@ -14,11 +15,12 @@ export const portalRoles = [
   "admin",
 ] as const satisfies readonly PortalRole[];
 
-export const adminRoles = [
-  "admin",
-] as const satisfies readonly PortalRole[];
+export const adminRoles = ["admin"] as const satisfies readonly PortalRole[];
 
-export const approverRoles = ["admin", "approver"] as const satisfies readonly PortalRole[];
+export const approverRoles = [
+  "admin",
+  "approver",
+] as const satisfies readonly PortalRole[];
 
 export const roleManagerRoles = approverRoles;
 
@@ -29,9 +31,17 @@ export type CurrentUser = {
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data, error } = await supabase.auth
+    .getUser()
+    .catch((error: unknown) => {
+      redirect(`/login?error=${formMessage(friendlyAuthErrorMessage(error))}`);
+    });
+
+  if (error) {
+    redirect(`/login?error=${formMessage(friendlyAuthErrorMessage(error))}`);
+  }
+
+  const { user } = data;
 
   if (!user) {
     return null;
