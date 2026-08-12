@@ -10,6 +10,7 @@ export const envSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   SUPABASE_SECRET_KEY: z.string().min(1).optional(),
   NEXT_PUBLIC_APP_URL: z.string().url(),
+  NEXT_PUBLIC_GUACAMOLE_URL: z.string().url().optional(),
   MOODLE_INTEGRATION_MODE: z.enum(["mock", "live"]).default("mock"),
   MOODLE_BASE_URL: z.string().url().optional(),
   MOODLE_API_TOKEN: z.string().optional(),
@@ -25,6 +26,10 @@ export const envSchema = z.object({
   BRIDGE_SECRET: z.string().optional(),
   INTEGRATION_MODE: z.enum(["mock", "live"]).default("mock"),
   CRON_SECRET: z.string().optional(),
+  AWX_PROGRESS_SECRET: z.string().min(16).optional(),
+  N8N_INTEGRATION_SECRET: z.string().min(16).optional(),
+  LAB_INTEGRATION_SECRET: z.string().min(16).optional(),
+  LAB_CREDENTIAL_ENCRYPTION_KEY: z.string().optional(),
 });
 
 export const publicEnvSchema = envSchema.pick({
@@ -35,6 +40,7 @@ export const publicEnvSchema = envSchema.pick({
   SUPABASE_ANON_KEY: true,
   SUPABASE_PUBLISHABLE_KEY: true,
   NEXT_PUBLIC_APP_URL: true,
+  NEXT_PUBLIC_GUACAMOLE_URL: true,
 });
 
 export type DigitalRccEnv = z.infer<typeof envSchema>;
@@ -63,12 +69,16 @@ export function readPublicEnv() {
     SUPABASE_ANON_KEY: envValue(process.env.SUPABASE_ANON_KEY),
     SUPABASE_PUBLISHABLE_KEY: envValue(process.env.SUPABASE_PUBLISHABLE_KEY),
     NEXT_PUBLIC_APP_URL: envValue(process.env.NEXT_PUBLIC_APP_URL),
+    NEXT_PUBLIC_GUACAMOLE_URL: envValue(
+      process.env.NEXT_PUBLIC_GUACAMOLE_URL,
+    ),
   });
 
   return {
     NEXT_PUBLIC_SUPABASE_URL: parsed.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: parsed.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     NEXT_PUBLIC_APP_URL: parsed.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_GUACAMOLE_URL: parsed.NEXT_PUBLIC_GUACAMOLE_URL,
   };
 }
 
@@ -103,5 +113,11 @@ export function readServerEnv() {
     BRIDGE_SECRET: envValue(process.env.BRIDGE_SECRET),
     INTEGRATION_MODE: envValue(process.env.INTEGRATION_MODE),
     CRON_SECRET: envValue(process.env.CRON_SECRET),
+    AWX_PROGRESS_SECRET: envValue(process.env.AWX_PROGRESS_SECRET),
+    N8N_INTEGRATION_SECRET: envValue(process.env.N8N_INTEGRATION_SECRET),
+    LAB_INTEGRATION_SECRET: envValue(process.env.LAB_INTEGRATION_SECRET),
+    LAB_CREDENTIAL_ENCRYPTION_KEY: envValue(
+      process.env.LAB_CREDENTIAL_ENCRYPTION_KEY,
+    ),
   });
 }

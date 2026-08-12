@@ -33,7 +33,7 @@ export default async function AdminPage() {
           Manage account status and role assignments. Request submissions are
           reviewed by admins and approvers from the approvals workspace.
         </p>
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-5 flex flex-col flex-wrap gap-3 sm:flex-row">
           <Link
             className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
             href="/dashboard/approvals"
@@ -63,6 +63,12 @@ export default async function AdminPage() {
             href="/admin/labs"
           >
             Lab capacity
+          </Link>
+          <Link
+            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
+            href="/admin/lab-progress"
+          >
+            Lab progress
           </Link>
           <Link
             className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"

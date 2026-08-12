@@ -1,10 +1,15 @@
 import Link from "next/link";
 
 import { DashboardNav } from "@/components/organisms/dashboard-nav";
+import { formatLabDateTime } from "@/lib/labs/access";
 import { getUserRoles, requireAnyRole, roleManagerRoles } from "@/lib/permissions/roles";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { processDueCohortNotificationsAction } from "@/lib/students/cohort-actions";
-import { cohortQueueConfig, getCohortQueueSummary } from "@/lib/students/cohorts";
+import {
+  cohortQueueConfig,
+  getCohortQueueSummary,
+  getCohortSlot,
+} from "@/lib/students/cohorts";
 
 type StudentQueuePageProps = {
   searchParams: Promise<{ error?: string; message?: string }>;
@@ -37,7 +42,7 @@ export default async function StudentQueuePage({ searchParams }: StudentQueuePag
         <div>
           <h1 className="text-4xl font-semibold">Student cohort queue</h1>
           <p className="mt-3 max-w-3xl leading-7 text-muted-foreground">
-            Admin-only schedule for 20-student, two-week lab access windows. The first cohort starts August 17, 2026, followed by one feedback week.
+            Admin-only schedule for 20-student, two-week lab access windows. The first cohort starts Sunday, August 16, 2026 at 12:00 AM Eastern, followed by one feedback week.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -56,7 +61,7 @@ export default async function StudentQueuePage({ searchParams }: StudentQueuePag
       <section className="grid gap-4 md:grid-cols-4">
         <Metric label="Seats per cohort" value={String(cohortQueueConfig.seatsPerCohort)} />
         <Metric label="Access window" value={`${cohortQueueConfig.accessWindowDays} days`} />
-        <Metric label="First start" value={formatDate(cohortQueueConfig.firstAccessStartIso)} />
+        <Metric label="First start" value={formatLabDateTime(getCohortSlot(1, 1).accessStartsAt)} />
         <Metric label="Feedback pause" value={`${cohortQueueConfig.feedbackBreakDaysAfterFirstCohort} days`} />
       </section>
       <section className="grid gap-4 lg:grid-cols-3">
@@ -142,14 +147,10 @@ function Message({ tone, message }: { tone: "error" | "success"; message: string
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
-    timeZone: "America/Chicago",
+    timeZone: "America/New_York",
   }).format(new Date(value));
 }
 
 function formatDateTime(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone: "America/Chicago",
-  }).format(new Date(value));
+  return formatLabDateTime(value);
 }

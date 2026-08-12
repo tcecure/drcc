@@ -1187,6 +1187,12 @@ export type Database = {
           source: string;
           cohort_number: number;
           seat_number: number;
+          pod_name: string;
+          lab_username: string;
+          credential_status: "pending_rotation" | "ready" | "failed" | "revoked";
+          credential_version: number;
+          credential_ready_at: string | null;
+          last_progress_synced_at: string | null;
           access_starts_at: string;
           access_ends_at: string;
           notification_send_at: string;
@@ -1202,6 +1208,12 @@ export type Database = {
           source?: string;
           cohort_number: number;
           seat_number: number;
+          pod_name: string;
+          lab_username: string;
+          credential_status?: Database["public"]["Tables"]["student_cohort_assignments"]["Row"]["credential_status"];
+          credential_version?: number;
+          credential_ready_at?: string | null;
+          last_progress_synced_at?: string | null;
           access_starts_at: string;
           access_ends_at: string;
           notification_send_at: string;
@@ -1215,6 +1227,12 @@ export type Database = {
           source?: string;
           cohort_number?: number;
           seat_number?: number;
+          pod_name?: string;
+          lab_username?: string;
+          credential_status?: Database["public"]["Tables"]["student_cohort_assignments"]["Row"]["credential_status"];
+          credential_version?: number;
+          credential_ready_at?: string | null;
+          last_progress_synced_at?: string | null;
           access_starts_at?: string;
           access_ends_at?: string;
           notification_send_at?: string;
@@ -1232,6 +1250,201 @@ export type Database = {
             referencedColumns: ["id"];
           },
         ];
+      };
+      lab_credentials: {
+        Row: {
+          id: string;
+          cohort_assignment_id: string;
+          credential_version: number;
+          encrypted_password: string;
+          initialization_vector: string;
+          auth_tag: string;
+          ready_at: string;
+          last_revealed_at: string | null;
+          reveal_count: number;
+          revoked_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          cohort_assignment_id: string;
+          credential_version: number;
+          encrypted_password: string;
+          initialization_vector: string;
+          auth_tag: string;
+          ready_at?: string;
+          last_revealed_at?: string | null;
+          reveal_count?: number;
+          revoked_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          credential_version?: number;
+          encrypted_password?: string;
+          initialization_vector?: string;
+          auth_tag?: string;
+          ready_at?: string;
+          last_revealed_at?: string | null;
+          reveal_count?: number;
+          revoked_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "lab_credentials_cohort_assignment_id_fkey";
+            columns: ["cohort_assignment_id"];
+            isOneToOne: true;
+            referencedRelation: "student_cohort_assignments";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      lab_progress: {
+        Row: {
+          id: string;
+          cohort_assignment_id: string;
+          user_id: string;
+          pod_name: string;
+          family: "AC" | "IA" | "SI" | "SC" | "MP" | "PE";
+          lab_id: string;
+          completed: boolean;
+          reason: string;
+          verifier_job_id: number | null;
+          verified_at: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          cohort_assignment_id: string;
+          user_id: string;
+          pod_name: string;
+          family: Database["public"]["Tables"]["lab_progress"]["Row"]["family"];
+          lab_id: string;
+          completed?: boolean;
+          reason?: string;
+          verifier_job_id?: number | null;
+          verified_at: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          pod_name?: string;
+          family?: Database["public"]["Tables"]["lab_progress"]["Row"]["family"];
+          lab_id?: string;
+          completed?: boolean;
+          reason?: string;
+          verifier_job_id?: number | null;
+          verified_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "lab_progress_cohort_assignment_id_fkey";
+            columns: ["cohort_assignment_id"];
+            isOneToOne: false;
+            referencedRelation: "student_cohort_assignments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "lab_progress_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      lab_sync_runs: {
+        Row: {
+          id: string;
+          source: string;
+          family: "AC" | "IA" | "SI" | "SC" | "MP" | "PE" | null;
+          verifier_job_id: number | null;
+          status: "running" | "successful" | "failed";
+          records_received: number;
+          records_upserted: number;
+          error_message: string | null;
+          started_at: string;
+          completed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          source?: string;
+          family?: Database["public"]["Tables"]["lab_sync_runs"]["Row"]["family"];
+          verifier_job_id?: number | null;
+          status?: Database["public"]["Tables"]["lab_sync_runs"]["Row"]["status"];
+          records_received?: number;
+          records_upserted?: number;
+          error_message?: string | null;
+          started_at?: string;
+          completed_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          source?: string;
+          family?: Database["public"]["Tables"]["lab_sync_runs"]["Row"]["family"];
+          verifier_job_id?: number | null;
+          status?: Database["public"]["Tables"]["lab_sync_runs"]["Row"]["status"];
+          records_received?: number;
+          records_upserted?: number;
+          error_message?: string | null;
+          started_at?: string;
+          completed_at?: string | null;
+        };
+        Relationships: [];
+      };
+      integration_events: {
+        Row: {
+          id: string;
+          event_type: string;
+          aggregate_type: string;
+          aggregate_id: string;
+          payload: Json;
+          idempotency_key: string;
+          status: "pending" | "processing" | "delivered" | "failed";
+          attempts: number;
+          available_at: string;
+          claimed_at: string | null;
+          delivered_at: string | null;
+          last_error: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          event_type: string;
+          aggregate_type: string;
+          aggregate_id: string;
+          payload?: Json;
+          idempotency_key: string;
+          status?: Database["public"]["Tables"]["integration_events"]["Row"]["status"];
+          attempts?: number;
+          available_at?: string;
+          claimed_at?: string | null;
+          delivered_at?: string | null;
+          last_error?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          event_type?: string;
+          aggregate_type?: string;
+          aggregate_id?: string;
+          payload?: Json;
+          idempotency_key?: string;
+          status?: Database["public"]["Tables"]["integration_events"]["Row"]["status"];
+          attempts?: number;
+          available_at?: string;
+          claimed_at?: string | null;
+          delivered_at?: string | null;
+          last_error?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
       };
       customer_engagements: {
         Row: {
