@@ -45,13 +45,13 @@ export const programAreas = [
     title: "14-Day Lab Window",
     description:
       "Students receive a 14-day completion window once their assigned lab slot starts.",
-    href: "/dashboard/labs/current",
+    href: "/dashboard/labs",
     icon: BriefcaseBusiness,
   },
   {
     title: "Digital Lab Guides",
     description:
-      "Every student can access the digital lab guide library for Student01 through Student20.",
+      "Every student can access Start Here and all 57 CMMC Level 1 lab guides inside the portal.",
     href: "/dashboard/labs/guides",
     icon: BookOpen,
   },

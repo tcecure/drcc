@@ -1,6 +1,13 @@
 import "server-only";
 
 import { recordAuditEvent } from "@/lib/audit/audit-log";
+import {
+  addLocalDays,
+  formatLabDateTime,
+  labAccessTimeZone,
+  zonedDateTimeToIso,
+} from "@/lib/labs/access";
+import { getLabSeatIdentity } from "@/lib/labs/identity";
 import { processEmailJob } from "@/lib/notifications/service";
 import { renderEmailTemplate } from "@/lib/notifications/templates";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -13,12 +20,13 @@ type CohortAssignment =
   Database["public"]["Tables"]["student_cohort_assignments"]["Row"];
 
 export const cohortQueueConfig = {
-  firstAccessStartIso: "2026-08-17T13:00:00.000Z",
+  firstAccessLocalDate: "2026-08-16",
   seatsPerCohort: 20,
   accessWindowDays: 14,
   feedbackBreakDaysAfterFirstCohort: 7,
-  notifyHourUtc: 14,
-  scheduleUntilIso: "2027-01-01T05:59:59.000Z",
+  notificationHourLocal: 0,
+  scheduleUntilLocalDate: "2026-12-31",
+  timeZone: labAccessTimeZone,
 };
 
 export type CohortSlot = {
@@ -48,17 +56,27 @@ export async function assignUserToNextCohort({
   }
 
   const slot = await getNextOpenCohortSlot();
-  const scheduleUntil = new Date(cohortQueueConfig.scheduleUntilIso);
+  const scheduleUntil = new Date(
+    zonedDateTimeToIso({
+      localDate: cohortQueueConfig.scheduleUntilLocalDate,
+      hour: 23,
+      minute: 59,
+      timeZone: cohortQueueConfig.timeZone,
+    }),
+  );
 
   if (new Date(slot.accessStartsAt) > scheduleUntil) {
     throw new Error("The cohort calendar is full through the end of the year.");
   }
 
+  const seatIdentity = getLabSeatIdentity(slot.seatNumber);
   const insert: CohortAssignmentInsert = {
     user_id: userId,
     source: "csv_import",
     cohort_number: slot.cohortNumber,
     seat_number: slot.seatNumber,
+    pod_name: seatIdentity.podName,
+    lab_username: seatIdentity.labUsername,
     access_starts_at: slot.accessStartsAt,
     access_ends_at: slot.accessEndsAt,
     notification_send_at: slot.notificationSendAt,
@@ -118,22 +136,32 @@ export async function processDueCohortNotifications(actorId: string | null = nul
 }
 
 export function getCohortSlot(cohortNumber: number, seatNumber: number): CohortSlot {
-  const accessStartsAt = addDays(
-    new Date(cohortQueueConfig.firstAccessStartIso),
+  const accessStartLocalDate = addLocalDays(
+    cohortQueueConfig.firstAccessLocalDate,
     cohortOffsetDays(cohortNumber),
   );
-  const accessEndsAt = addDays(accessStartsAt, cohortQueueConfig.accessWindowDays);
-  const notificationSendAt = new Date(accessStartsAt);
-
-  notificationSendAt.setUTCDate(notificationSendAt.getUTCDate() - 1);
-  notificationSendAt.setUTCHours(cohortQueueConfig.notifyHourUtc, 0, 0, 0);
+  const accessEndLocalDate = addLocalDays(
+    accessStartLocalDate,
+    cohortQueueConfig.accessWindowDays,
+  );
+  const notificationLocalDate = accessStartLocalDate;
 
   return {
     cohortNumber,
     seatNumber,
-    accessStartsAt: accessStartsAt.toISOString(),
-    accessEndsAt: accessEndsAt.toISOString(),
-    notificationSendAt: notificationSendAt.toISOString(),
+    accessStartsAt: zonedDateTimeToIso({
+      localDate: accessStartLocalDate,
+      timeZone: cohortQueueConfig.timeZone,
+    }),
+    accessEndsAt: zonedDateTimeToIso({
+      localDate: accessEndLocalDate,
+      timeZone: cohortQueueConfig.timeZone,
+    }),
+    notificationSendAt: zonedDateTimeToIso({
+      localDate: notificationLocalDate,
+      hour: cohortQueueConfig.notificationHourLocal,
+      timeZone: cohortQueueConfig.timeZone,
+    }),
   };
 }
 
@@ -214,7 +242,7 @@ async function sendCohortNotification({
   const actionUrl = `${env.NEXT_PUBLIC_APP_URL}/dashboard/labs`;
   const rendered = renderEmailTemplate("lab_window_starting", {
     actionUrl,
-    notes: `Your access window runs ${formatDate(assignment.access_starts_at)} through ${formatDate(assignment.access_ends_at)}. Cohort ${assignment.cohort_number}, seat ${assignment.seat_number}.`,
+    notes: `Your access window runs ${formatLabDateTime(assignment.access_starts_at)} through ${formatLabDateTime(assignment.access_ends_at)}. Cohort ${assignment.cohort_number}, seat ${assignment.seat_number}.`,
   });
   const { data: job } = await supabase
     .from("email_jobs")
@@ -276,17 +304,4 @@ function cohortOffsetDays(cohortNumber: number) {
     cohortQueueConfig.feedbackBreakDaysAfterFirstCohort +
     (cohortNumber - 2) * cohortQueueConfig.accessWindowDays
   );
-}
-
-function addDays(date: Date, days: number) {
-  const next = new Date(date);
-  next.setUTCDate(next.getUTCDate() + days);
-  return next;
-}
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-    timeZone: "America/Chicago",
-  }).format(new Date(value));
 }

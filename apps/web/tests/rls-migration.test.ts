@@ -65,6 +65,13 @@ const studentCohortQueueMigration = readFileSync(
   resolve(process.cwd(), "../../supabase/migrations/20260810110000_student_cohort_queue.sql"),
   "utf8",
 );
+const studentCommandCenterMigration = readFileSync(
+  resolve(
+    process.cwd(),
+    "../../supabase/migrations/20260812170000_student_command_center.sql",
+  ),
+  "utf8",
+);
 
 describe("auth profiles roles migration", () => {
   it("enables RLS for user-facing tables", () => {
@@ -216,5 +223,17 @@ describe("auth profiles roles migration", () => {
     expect(studentCohortQueueMigration).toContain("seat_number between 1 and 20");
     expect(studentCohortQueueMigration).toContain("students can read their own cohort assignment");
     expect(studentCohortQueueMigration).toContain("approvers can manage cohort assignments");
+  });
+
+  it("adds encrypted credentials, AWX progress, and a private integration outbox", () => {
+    expect(studentCommandCenterMigration).toContain("create table if not exists public.lab_credentials");
+    expect(studentCommandCenterMigration).toContain("encrypted_password text not null");
+    expect(studentCommandCenterMigration).not.toContain("\n  password text");
+    expect(studentCommandCenterMigration).toContain("create table if not exists public.lab_progress");
+    expect(studentCommandCenterMigration).toContain("create table if not exists public.lab_sync_runs");
+    expect(studentCommandCenterMigration).toContain("create table if not exists public.integration_events");
+    expect(studentCommandCenterMigration).toContain("students can read their own lab progress");
+    expect(studentCommandCenterMigration).toContain("alter table public.lab_credentials enable row level security");
+    expect(studentCommandCenterMigration).toContain("alter table public.integration_events enable row level security");
   });
 });
