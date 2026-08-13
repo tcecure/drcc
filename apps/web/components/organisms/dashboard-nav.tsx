@@ -1,10 +1,12 @@
 import Link from "next/link";
 
 import { logoutAction } from "@/lib/auth/actions";
+import { getPrimaryPortalRoleLabel } from "@/lib/permissions/role-label";
 import { roleManagerRoles, type PortalRole } from "@/lib/permissions/roles";
 
 export function DashboardNav({ roles }: { roles: PortalRole[] }) {
   const canManageRoles = roleManagerRoles.some((role) => roles.includes(role));
+  const roleLabel = getPrimaryPortalRoleLabel(roles);
 
   return (
     <nav
@@ -48,7 +50,10 @@ export function DashboardNav({ roles }: { roles: PortalRole[] }) {
           </Link>
         </>
       ) : null}
-      <form action={logoutAction} className="ml-auto">
+      <span className="ml-auto rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-primary">
+        {roleLabel}
+      </span>
+      <form action={logoutAction}>
         <button
           className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
           type="submit"
