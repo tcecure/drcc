@@ -72,6 +72,13 @@ const studentCommandCenterMigration = readFileSync(
   ),
   "utf8",
 );
+const sundayMidnightCohortsMigration = readFileSync(
+  resolve(
+    process.cwd(),
+    "../../supabase/migrations/20260813190000_reconcile_sunday_midnight_cohorts.sql",
+  ),
+  "utf8",
+);
 
 describe("auth profiles roles migration", () => {
   it("enables RLS for user-facing tables", () => {
@@ -223,6 +230,13 @@ describe("auth profiles roles migration", () => {
     expect(studentCohortQueueMigration).toContain("seat_number between 1 and 20");
     expect(studentCohortQueueMigration).toContain("students can read their own cohort assignment");
     expect(studentCohortQueueMigration).toContain("approvers can manage cohort assignments");
+  });
+
+  it("reconciles current and future cohorts to Sunday midnight Eastern", () => {
+    expect(sundayMidnightCohortsMigration).toContain("date '2026-08-16'");
+    expect(sundayMidnightCohortsMigration).toContain("at time zone 'America/New_York'");
+    expect(sundayMidnightCohortsMigration).toContain("notification_send_at = schedule.access_starts_at");
+    expect(sundayMidnightCohortsMigration).toContain("status not in ('completed', 'cancelled')");
   });
 
   it("adds encrypted credentials, AWX progress, and a private integration outbox", () => {
