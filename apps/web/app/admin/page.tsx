@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import {
+  DashboardCard,
+  MetricCard,
+} from "@/components/molecules/dashboard-card";
 import { DashboardNav } from "@/components/organisms/dashboard-nav";
 import {
   getUserRoles,
@@ -23,6 +27,16 @@ export default async function AdminPage() {
     .select("id, email, full_name, organization, account_status")
     .order("created_at", { ascending: false })
     .limit(20);
+  const adminActions = [
+    { href: "/dashboard/approvals", label: "Open approvals" },
+    { href: "/admin/students/import", label: "Import students" },
+    { href: "/admin/students/queue", label: "Student queue" },
+    { href: "/admin/email-jobs", label: "Email jobs" },
+    { href: "/admin/labs", label: "Lab capacity" },
+    { href: "/admin/lab-queue", label: "Lab requests" },
+    { href: "/admin/moodle", label: "Moodle" },
+    { href: "/admin/support", label: "Support desk" },
+  ];
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8">
@@ -33,82 +47,42 @@ export default async function AdminPage() {
           Manage account status and role assignments. Request submissions are
           reviewed by admins and approvers from the approvals workspace.
         </p>
-        <div className="mt-5 flex flex-col flex-wrap gap-3 sm:flex-row">
-          <Link
-            className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
-            href="/dashboard/approvals"
-          >
-            Open approvals
-          </Link>
-          <Link
-            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
-            href="/admin/resources"
-          >
-            Manage resources
-          </Link>
-          <Link
-            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
-            href="/admin/moodle"
-          >
-            Moodle integration
-          </Link>
-          <Link
-            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
-            href="/admin/lab-queue"
-          >
-            Lab queue
-          </Link>
-          <Link
-            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
-            href="/admin/labs"
-          >
-            Lab capacity
-          </Link>
-          <Link
-            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
-            href="/admin/lab-progress"
-          >
-            Lab progress
-          </Link>
-          <Link
-            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
-            href="/admin/students/queue"
-          >
-            Student queue
-          </Link>
-          <Link
-            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
-            href="/admin/students/import"
-          >
-            Import students
-          </Link>
-          <Link
-            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
-            href="/admin/email-jobs"
-          >
-            Email jobs
-          </Link>
-          <Link
-            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
-            href="/admin/provisioning"
-          >
-            Provisioning
-          </Link>
-          <Link
-            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
-            href="/admin/verifications"
-          >
-            Verifications
-          </Link>
-          <Link
-            className="inline-flex h-11 items-center justify-center rounded-md border px-4 text-sm font-medium hover:bg-muted"
-            href="/admin/support"
-          >
-            Support
-          </Link>
-        </div>
       </section>
-      <section className="rounded-lg border bg-card shadow-sm">
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <MetricCard
+          label="Recent users"
+          value={String(profiles?.length ?? 0)}
+          helper="Showing the latest accounts created in Supabase."
+        />
+        <MetricCard
+          label="Student seats"
+          value="20"
+          helper="Hands-on capacity per two-week cohort."
+        />
+        <MetricCard
+          label="Review roles"
+          value="2"
+          helper="Admins and approvers can manage student access."
+        />
+        <MetricCard
+          label="Automation"
+          value="Cron"
+          helper="Queue notifications are ready for scheduled processing."
+        />
+      </section>
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {adminActions.map((action) => (
+          <DashboardCard key={action.href} title={action.label}>
+            <Link
+              className="inline-flex text-sm font-semibold text-primary hover:underline"
+              href={action.href}
+            >
+              Open workspace
+            </Link>
+          </DashboardCard>
+        ))}
+      </section>
+      <section className="dashboard-card p-0">
         <div className="border-b p-5">
           <h2 className="text-xl font-semibold">Recent users</h2>
         </div>
@@ -119,7 +93,9 @@ export default async function AdminPage() {
               className="grid gap-3 p-5 text-sm lg:grid-cols-[1fr_1fr_auto]"
             >
               <div>
-                <p className="font-medium">{profile.full_name || profile.email}</p>
+                <p className="font-medium">
+                  {profile.full_name || profile.email}
+                </p>
                 <p className="text-muted-foreground">{profile.email}</p>
               </div>
               <div>
