@@ -195,6 +195,7 @@
       grid-template-columns: 16rem minmax(0, 1fr);
       align-items: start;
       column-gap: 2rem;
+      row-gap: 2rem;
       padding-left: 2rem;
       padding-right: 2rem;
     }
@@ -202,7 +203,7 @@
     .dashboard-sidebar {
       @apply w-64 self-start;
       grid-column: 1;
-      grid-row: 1 / -1;
+      grid-row: 1;
     }
 
     main:has(> [data-dashboard-nav]) > :not([data-dashboard-nav]) {
