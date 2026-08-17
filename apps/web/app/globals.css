@@ -148,7 +148,7 @@
   }
 
   .dashboard-sidebar__panel {
-    @apply flex flex-col gap-5 rounded-lg border border-sidebar-border bg-sidebar/95 p-4 text-sidebar-foreground shadow-sm backdrop-blur-xl;
+    @apply flex flex-col gap-4 rounded-lg border border-sidebar-border bg-sidebar/95 p-4 text-sidebar-foreground shadow-sm backdrop-blur-xl;
     background-image:
       linear-gradient(135deg, oklch(0.72 0.18 230 / 12%), transparent 42%),
       radial-gradient(
@@ -159,7 +159,7 @@
   }
 
   .dashboard-sidebar__scroll {
-    @apply grid max-h-[34rem] gap-5 overflow-auto pr-1;
+    @apply grid max-h-[28rem] gap-4 overflow-auto pr-1;
   }
 
   .dashboard-sidebar__link {
@@ -190,18 +190,19 @@
 
   @media (min-width: 1024px) {
     main:has(> [data-dashboard-nav]) {
-      @apply max-w-none py-8;
+      @apply mx-auto w-full max-w-[118rem] py-8;
       display: grid;
       grid-template-columns: 16rem minmax(0, 1fr);
       align-items: start;
       column-gap: 2rem;
-      padding-left: 1.5rem;
+      padding-left: 2rem;
       padding-right: 2rem;
     }
 
     .dashboard-sidebar {
-      @apply sticky top-24 w-64 self-start;
-      grid-row: 1 / span 20;
+      @apply w-64 self-start;
+      grid-column: 1;
+      grid-row: 1 / -1;
     }
 
     main:has(> [data-dashboard-nav]) > :not([data-dashboard-nav]) {
@@ -210,11 +211,11 @@
     }
 
     .dashboard-sidebar__panel {
-      max-height: calc(100vh - 8rem);
+      max-height: none;
     }
 
     .dashboard-sidebar__scroll {
-      @apply flex-1 content-start;
+      @apply content-start overflow-visible pr-0;
       max-height: none;
     }
   }
