@@ -22,11 +22,59 @@ export default async function AdminPage() {
   await requireAnyRole(roleManagerRoles);
   const roles = await getUserRoles();
   const supabase = createAdminClient();
-  const { data: profiles } = await supabase
-    .from("profiles")
-    .select("id, email, full_name, organization, account_status")
-    .order("created_at", { ascending: false })
-    .limit(20);
+  const [
+    { data: profiles },
+    { count: queuedStudents },
+    { count: notifiedStudents },
+    { count: activeStudents },
+    { count: pendingLabRequests },
+    { count: activeLabInstances },
+    { count: maintenanceLabInstances },
+    { data: capacitySettings },
+  ] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("id, email, full_name, organization, account_status")
+      .order("created_at", { ascending: false })
+      .limit(20),
+    supabase
+      .from("student_cohort_assignments")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "queued"),
+    supabase
+      .from("student_cohort_assignments")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "notified"),
+    supabase
+      .from("student_cohort_assignments")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "active"),
+    supabase
+      .from("lab_requests")
+      .select("id", { count: "exact", head: true })
+      .in("status", ["submitted", "queued", "on_hold"]),
+    supabase
+      .from("lab_instances")
+      .select("id", { count: "exact", head: true })
+      .in("status", ["reserved", "provisioning", "active", "expiring"]),
+    supabase
+      .from("lab_instances")
+      .select("id", { count: "exact", head: true })
+      .in("status", ["maintenance", "disabled", "resetting"]),
+    supabase
+      .from("lab_capacity_settings")
+      .select("maximum_active, maximum_reserved, standard_duration_days")
+      .is("lab_track_id", null)
+      .maybeSingle(),
+  ]);
+  const totalActiveStudents = (activeStudents ?? 0) + (notifiedStudents ?? 0);
+  const labCapacity = capacitySettings?.maximum_active ?? 20;
+  const queueStatus =
+    (queuedStudents ?? 0) > 0 ? `${queuedStudents} waiting` : "No waitlist";
+  const labStatus =
+    (activeLabInstances ?? 0) > 0
+      ? `${activeLabInstances} running`
+      : "API pending";
   const adminActions = [
     { href: "/dashboard/approvals", label: "Open approvals" },
     { href: "/admin/students/import", label: "Import students" },
@@ -50,24 +98,38 @@ export default async function AdminPage() {
       </section>
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
-          label="Recent users"
-          value={String(profiles?.length ?? 0)}
-          helper="Showing the latest accounts created in Supabase."
+          label="Queue Status"
+          value={queueStatus}
+          helper="Students waiting for the next available two-week cohort."
         />
         <MetricCard
-          label="Student seats"
-          value="20"
-          helper="Hands-on capacity per two-week cohort."
+          label="Lab Status"
+          value={labStatus}
+          helper={
+            maintenanceLabInstances
+              ? `${maintenanceLabInstances} lab environments need attention. Proxmox live status is next.`
+              : "Proxmox live status will show per-lab health here."
+          }
         />
         <MetricCard
-          label="Review roles"
-          value="2"
-          helper="Admins and approvers can manage student access."
+          label="Active Students"
+          value={String(totalActiveStudents)}
+          helper="Students notified or inside an active access window."
         />
         <MetricCard
-          label="Automation"
-          value="Cron"
-          helper="Queue notifications are ready for scheduled processing."
+          label="Queued Students"
+          value={String(queuedStudents ?? 0)}
+          helper="Students assigned to a future cohort seat."
+        />
+        <MetricCard
+          label="Lab Capacity"
+          value={`${totalActiveStudents} / ${labCapacity}`}
+          helper={`${capacitySettings?.standard_duration_days ?? 14}-day access window with ${capacitySettings?.maximum_reserved ?? 20} reserved slots supported.`}
+        />
+        <MetricCard
+          label="Lab Request"
+          value={String(pendingLabRequests ?? 0)}
+          helper="Submitted, queued, or on-hold hands-on lab requests."
         />
       </section>
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

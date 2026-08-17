@@ -204,6 +204,11 @@
       grid-row: 1 / span 20;
     }
 
+    main:has(> [data-dashboard-nav]) > :not([data-dashboard-nav]) {
+      grid-column: 2;
+      min-width: 0;
+    }
+
     .dashboard-sidebar__panel {
       max-height: calc(100vh - 8rem);
     }
