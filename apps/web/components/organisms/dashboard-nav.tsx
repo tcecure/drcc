@@ -12,7 +12,6 @@ import {
   LogOut,
   Mail,
   Server,
-  Settings,
   ShieldCheck,
   User,
   Users,
@@ -30,9 +29,9 @@ type NavItem = {
 
 const studentItems: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/dashboard/labs/guides", label: "Lab guides", icon: BookOpen },
+  { href: "/dashboard/labs/guides", label: "Guides", icon: BookOpen },
   { href: "/dashboard/labs", label: "Labs", icon: Server },
-  { href: "/dashboard/labs/queue", label: "Queue status", icon: ListChecks },
+  { href: "/dashboard/labs/queue", label: "Queue", icon: ListChecks },
   { href: "/dashboard/training", label: "Training", icon: GraduationCap },
   { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
   { href: "/dashboard/profile", label: "Profile", icon: User },
@@ -42,58 +41,30 @@ const studentItems: NavItem[] = [
 const operationsItems: NavItem[] = [
   { href: "/dashboard/approvals", label: "Approvals", icon: ClipboardCheck },
   { href: "/admin/students/queue", label: "Student queue", icon: Users },
-  { href: "/admin/students/import", label: "Import students", icon: Import },
+  { href: "/admin/students/import", label: "Import", icon: Import },
   { href: "/admin/email-jobs", label: "Email jobs", icon: Mail },
-  { href: "/admin/labs", label: "Lab capacity", icon: Gauge },
-];
-
-const adminItems: NavItem[] = [
-  { href: "/admin", label: "Admin overview", icon: ShieldCheck },
-  { href: "/admin/moodle", label: "Moodle", icon: GraduationCap },
-  { href: "/admin/lab-queue", label: "Lab requests", icon: ListChecks },
-  { href: "/admin/resources", label: "Resources", icon: BookOpen },
-  { href: "/admin/provisioning", label: "Provisioning", icon: Server },
-  { href: "/admin/support", label: "Support desk", icon: HelpCircle },
-  { href: "/admin/integrations", label: "Settings", icon: Settings },
+  { href: "/admin/labs", label: "Capacity", icon: Gauge },
+  { href: "/admin", label: "Admin", icon: ShieldCheck },
 ];
 
 export function DashboardNav({ roles }: { roles: PortalRole[] }) {
   const canManage = roleManagerRoles.some((role) => roles.includes(role));
-  const isAdmin = roles.includes("admin");
+  const items = canManage
+    ? [...studentItems, ...operationsItems]
+    : studentItems;
 
   return (
-    <nav
-      aria-label="Dashboard navigation"
-      className="dashboard-sidebar"
-      data-dashboard-nav
-    >
-      <div className="dashboard-sidebar__panel">
-        <div className="space-y-1 border-b border-sidebar-border/80 pb-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sidebar-foreground/55">
+    <nav aria-label="Dashboard navigation" className="dashboard-nav">
+      <div className="dashboard-nav__header">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
             DigitalRCC
           </p>
-          <p className="text-lg font-semibold text-sidebar-foreground">
-            Lab Companion
-          </p>
-          <p className="text-xs leading-5 text-sidebar-foreground/65">
-            Role-aware lab operations workspace.
-          </p>
+          <p className="font-semibold">Lab Companion</p>
         </div>
-
-        <div className="dashboard-sidebar__scroll">
-          <NavSection items={studentItems} title="Student" />
-          {canManage ? (
-            <NavSection items={operationsItems} title="Operations" />
-          ) : null}
-          {isAdmin ? <NavSection items={adminItems} title="Admin" /> : null}
-        </div>
-
-        <form
-          action={logoutAction}
-          className="border-t border-sidebar-border/80 pt-4"
-        >
+        <form action={logoutAction}>
           <button
-            className="dashboard-sidebar__link w-full text-sidebar-foreground/75 hover:text-sidebar-foreground"
+            className="inline-flex h-10 items-center gap-2 rounded-md px-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
             type="submit"
           >
             <LogOut className="size-4" />
@@ -101,20 +72,10 @@ export function DashboardNav({ roles }: { roles: PortalRole[] }) {
           </button>
         </form>
       </div>
-    </nav>
-  );
-}
-
-function NavSection({ items, title }: { items: NavItem[]; title: string }) {
-  return (
-    <section className="grid gap-2">
-      <h2 className="px-3 text-xs font-semibold uppercase tracking-[0.2em] text-sidebar-foreground/45">
-        {title}
-      </h2>
-      <div className="grid gap-1">
+      <div className="dashboard-nav__links">
         {items.map((item) => (
           <Link
-            className="dashboard-sidebar__link"
+            className="dashboard-nav__link"
             href={item.href}
             key={item.href}
           >
@@ -123,6 +84,6 @@ function NavSection({ items, title }: { items: NavItem[]; title: string }) {
           </Link>
         ))}
       </div>
-    </section>
+    </nav>
   );
 }
