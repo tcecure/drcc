@@ -190,17 +190,22 @@
 
   @media (min-width: 1024px) {
     main:has(> [data-dashboard-nav]) {
-      @apply max-w-none gap-8 py-8;
-      padding-left: 19rem;
+      @apply max-w-none py-8;
+      display: grid;
+      grid-template-columns: 16rem minmax(0, 1fr);
+      align-items: start;
+      column-gap: 2rem;
+      padding-left: 1.5rem;
       padding-right: 2rem;
     }
 
     .dashboard-sidebar {
-      @apply fixed bottom-6 left-6 top-24 z-20 w-64;
+      @apply sticky top-24 w-64 self-start;
+      grid-row: 1 / span 20;
     }
 
     .dashboard-sidebar__panel {
-      @apply h-full;
+      max-height: calc(100vh - 8rem);
     }
 
     .dashboard-sidebar__scroll {
