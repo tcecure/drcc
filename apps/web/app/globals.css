@@ -187,4 +187,118 @@
       transparent
     );
   }
+
+  .vision-shell {
+    @apply grid min-h-screen gap-6 bg-[#060b28] p-4 text-white lg:grid-cols-[17rem_minmax(0,1fr)] lg:p-6;
+    background-image:
+      radial-gradient(
+        circle at 12% 8%,
+        rgb(14 165 233 / 26%),
+        transparent 28rem
+      ),
+      radial-gradient(
+        circle at 80% 0%,
+        rgb(124 58 237 / 22%),
+        transparent 30rem
+      ),
+      linear-gradient(rgb(125 211 252 / 7%) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(125 211 252 / 7%) 1px, transparent 1px);
+    background-size:
+      auto,
+      auto,
+      48px 48px,
+      48px 48px;
+  }
+
+  .vision-sidebar {
+    @apply flex flex-col gap-5 rounded-lg border border-white/10 bg-white/[0.06] p-4 shadow-2xl shadow-cyan-950/40 backdrop-blur-2xl;
+  }
+
+  .vision-brand {
+    @apply flex items-center gap-3 border-b border-white/10 pb-4;
+  }
+
+  .vision-brand__mark {
+    @apply flex size-11 items-center justify-center rounded-lg bg-cyan-300 text-sm font-bold text-slate-950 shadow-lg shadow-cyan-500/30;
+  }
+
+  .vision-sidebar__nav {
+    @apply grid gap-1;
+  }
+
+  .vision-sidebar__link {
+    @apply inline-flex h-11 items-center gap-3 rounded-md px-3 text-sm font-medium text-slate-300 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300;
+  }
+
+  .vision-main {
+    @apply grid content-start gap-6;
+  }
+
+  .vision-topbar {
+    @apply flex flex-col gap-4 rounded-lg border border-white/10 bg-white/[0.05] p-5 shadow-xl shadow-cyan-950/25 backdrop-blur-2xl sm:flex-row sm:items-center sm:justify-between;
+  }
+
+  .vision-role-stack {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .vision-role-chip {
+    @apply rounded-md border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100;
+  }
+
+  .vision-card {
+    @apply relative overflow-hidden rounded-lg border border-white/10 bg-white/[0.07] p-5 shadow-xl shadow-cyan-950/25 backdrop-blur-2xl;
+    background-image:
+      linear-gradient(135deg, rgb(56 189 248 / 14%), transparent 42%),
+      radial-gradient(
+        circle at 100% 0%,
+        rgb(139 92 246 / 18%),
+        transparent 14rem
+      );
+  }
+
+  .vision-card::before {
+    @apply absolute inset-x-0 top-0 h-px;
+    content: "";
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(103 232 249 / 78%),
+      transparent
+    );
+  }
+
+  .vision-card__eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200/70;
+  }
+
+  .vision-card--cyan {
+    background-image:
+      linear-gradient(135deg, rgb(34 211 238 / 18%), transparent 48%),
+      radial-gradient(
+        circle at 100% 0%,
+        rgb(14 165 233 / 18%),
+        transparent 14rem
+      );
+  }
+
+  .vision-card--violet {
+    background-image:
+      linear-gradient(135deg, rgb(139 92 246 / 20%), transparent 48%),
+      radial-gradient(
+        circle at 100% 0%,
+        rgb(236 72 153 / 12%),
+        transparent 14rem
+      );
+  }
+
+  .vision-card--emerald {
+    background-image:
+      linear-gradient(135deg, rgb(45 212 191 / 16%), transparent 48%),
+      radial-gradient(
+        circle at 100% 0%,
+        rgb(52 211 153 / 14%),
+        transparent 14rem
+      );
+  }
 }
