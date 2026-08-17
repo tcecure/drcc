@@ -14,8 +14,8 @@ import {
 } from "@/lib/permissions/roles";
 
 export const metadata: Metadata = {
-  title: "Dashboard V2",
-  description: "Vision UI-inspired DigitalRCC dashboard preview.",
+  title: "Dashboard",
+  description: "DigitalRCC lab companion dashboard.",
 };
 
 export default async function DashboardV2Page() {
@@ -28,7 +28,7 @@ export default async function DashboardV2Page() {
 
   return (
     <VisionShell
-      eyebrow="Vision UI preview"
+      eyebrow="Lab companion"
       roles={roles}
       title={`${audience[0].toUpperCase()}${audience.slice(1)} dashboard`}
     >
@@ -93,7 +93,7 @@ export default async function DashboardV2Page() {
           value="20"
         />
         <VisionMetricCard
-          helper="The V2 shell uses the same Supabase env and auth helpers."
+          helper="The dashboard uses the same Supabase env and auth helpers."
           label="Supabase"
           tone="emerald"
           value="Live"
@@ -105,8 +105,8 @@ export default async function DashboardV2Page() {
           ["Queue Status", "/dashboard/labs/queue"],
           ["Training", "/dashboard/training"],
           [
-            roles.includes("admin") ? "Admin V2" : "Support",
-            roles.includes("admin") ? "/admin-v2" : "/dashboard/support",
+            roles.includes("admin") ? "Admin" : "Support",
+            roles.includes("admin") ? "/admin" : "/dashboard/support",
           ],
         ].map(([label, href]) => (
           <VisionCard key={href} title={label}>

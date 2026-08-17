@@ -1,4 +1,9 @@
-export const protectedRoutePrefixes = ["/dashboard", "/admin"] as const;
+export const protectedRoutePrefixes = [
+  "/dashboard",
+  "/dashboard-v2",
+  "/admin",
+  "/admin-v2",
+] as const;
 
 export function isProtectedPath(pathname: string) {
   return protectedRoutePrefixes.some(

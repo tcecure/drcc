@@ -3,8 +3,16 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { isAuthPath, isProtectedPath } from "./lib/auth/protected-routes";
 
+const AUTH_LOOKUP_TIMEOUT_MS = 5000;
+
 function envValue(value: string | undefined) {
   return value?.trim() || undefined;
+}
+
+function timeout<T>(milliseconds: number, value: T) {
+  return new Promise<T>((resolve) => {
+    setTimeout(() => resolve(value), milliseconds);
+  });
 }
 
 export async function proxy(request: NextRequest) {
@@ -44,7 +52,10 @@ export async function proxy(request: NextRequest) {
 
   const {
     data: { user },
-  } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
+  } = await Promise.race([
+    supabase.auth.getUser().catch(() => ({ data: { user: null } })),
+    timeout(AUTH_LOOKUP_TIMEOUT_MS, { data: { user: null } }),
+  ]);
 
   if (!user && isProtectedPath(request.nextUrl.pathname)) {
     const redirectUrl = request.nextUrl.clone();

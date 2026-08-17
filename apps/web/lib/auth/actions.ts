@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { recordAuditEvent } from "@/lib/audit/audit-log";
 import { formMessage, friendlyAuthErrorMessage } from "@/lib/auth/errors";
 import {
+  getUserRoles,
   requireAnyRole,
   requireAuthenticatedUser,
   roleManagerRoles,
@@ -22,6 +23,17 @@ import {
   roleAssignmentSchema,
   signupSchema,
 } from "@/lib/validation/forms";
+
+async function getPostLoginRedirect(defaultRedirect: string) {
+  if (defaultRedirect && defaultRedirect !== "/dashboard") {
+    return defaultRedirect;
+  }
+
+  const roles = await getUserRoles();
+  const canManage = roleManagerRoles.some((role) => roles.includes(role));
+
+  return canManage ? "/admin-v2" : "/dashboard-v2";
+}
 
 export async function signupAction(formData: FormData) {
   const parsed = signupSchema.safeParse({
@@ -107,7 +119,7 @@ export async function loginAction(formData: FormData) {
     redirect(`/login?error=${formMessage(authError)}`);
   }
 
-  redirect(parsed.data.redirectTo || "/dashboard");
+  redirect(await getPostLoginRedirect(parsed.data.redirectTo || "/dashboard"));
 }
 
 export async function logoutAction() {

@@ -14,8 +14,8 @@ import {
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = {
-  title: "Admin V2",
-  description: "Vision UI-inspired DigitalRCC admin dashboard preview.",
+  title: "Admin",
+  description: "DigitalRCC lab companion administration dashboard.",
 };
 
 export default async function AdminV2Page() {

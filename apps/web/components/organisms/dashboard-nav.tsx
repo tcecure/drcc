@@ -29,7 +29,6 @@ type NavItem = {
 
 const studentItems: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/dashboard-v2", label: "V2 Preview", icon: ShieldCheck },
   { href: "/dashboard/labs/guides", label: "Guides", icon: BookOpen },
   { href: "/dashboard/labs", label: "Labs", icon: Server },
   { href: "/dashboard/labs/queue", label: "Queue", icon: ListChecks },
@@ -41,12 +40,11 @@ const studentItems: NavItem[] = [
 
 const operationsItems: NavItem[] = [
   { href: "/dashboard/approvals", label: "Approvals", icon: ClipboardCheck },
-  { href: "/admin-v2", label: "Admin V2", icon: ShieldCheck },
+  { href: "/admin", label: "Admin Overview", icon: ShieldCheck },
   { href: "/admin/students/queue", label: "Student queue", icon: Users },
   { href: "/admin/students/import", label: "Import", icon: Import },
   { href: "/admin/email-jobs", label: "Email jobs", icon: Mail },
   { href: "/admin/labs", label: "Capacity", icon: Gauge },
-  { href: "/admin", label: "Admin", icon: ShieldCheck },
 ];
 
 export function DashboardNav({ roles }: { roles: PortalRole[] }) {

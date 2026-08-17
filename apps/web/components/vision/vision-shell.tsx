@@ -29,7 +29,7 @@ type VisionNavItem = {
 };
 
 const studentNav: VisionNavItem[] = [
-  { href: "/dashboard-v2", label: "Overview", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/labs/guides", label: "Lab Guides", icon: BookOpen },
   { href: "/dashboard/labs", label: "Labs", icon: Server },
   { href: "/dashboard/labs/queue", label: "Queue Status", icon: ListChecks },
@@ -40,7 +40,7 @@ const studentNav: VisionNavItem[] = [
 ];
 
 const operationsNav: VisionNavItem[] = [
-  { href: "/admin-v2", label: "Admin Overview", icon: ShieldCheck },
+  { href: "/admin", label: "Admin Overview", icon: ShieldCheck },
   { href: "/dashboard/approvals", label: "Approvals", icon: ClipboardCheck },
   { href: "/admin/students/queue", label: "Student Queue", icon: Users },
   { href: "/admin/students/import", label: "Import Students", icon: Import },
@@ -72,7 +72,7 @@ export function VisionShell({
           <span className="vision-brand__mark">DR</span>
           <div>
             <p className="text-sm font-semibold text-white">DigitalRCC</p>
-            <p className="text-xs text-white/55">Lab Companion V2</p>
+            <p className="text-xs text-white/55">Lab Companion</p>
           </div>
         </div>
         <nav className="vision-sidebar__nav">
